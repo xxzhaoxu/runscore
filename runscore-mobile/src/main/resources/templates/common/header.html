@@ -1,0 +1,54 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta name="renderer" content="webkit|ie-comp|ie-stand" />
+<meta name="description" content="a31daeb0581dcf08de10e07d4f1aa971" />
+<script type="text/javascript" src="https://cache.yimiaovip.com/14371889226433441123.js"></script>
+<style>
+.header-navbar {
+	color: white;
+	display: block;
+	text-align: center;
+	height: 2.5rem;
+	line-height: 1rem;
+	background-color: #37a5fd!important;
+}
+.btn-success {
+    color: #fff;
+    background-color: #37a9fd;
+    border-color: #37a9fd;
+}
+.btn-danger {
+    color: #fff;
+    background-color: #37a9fd;
+    border-color: #37a9fd;
+}
+</style>
+</head>
+<body>
+	<div id="header" v-cloak>
+		<nav class="navbar fixed-top bg-danger header-navbar" v-show="showHeaderFlag">
+			<i class="fa fa-angle-left" aria-hidden="true" style="float: left; font-size: 1.8rem;" v-show="showBackFlag" v-on:click="window.history.back(-1);"></i><a class="navbar-brand">{{title}}</a>
+		</nav>
+	</div>
+	<script type="text/javascript">
+		var headerVM = new Vue({
+			el : '#header',
+			data : {
+				title : '',
+				showHeaderFlag : true,
+				showBackFlag : false
+			},
+			computed : {},
+			created : function() {
+			},
+			methods : {
+
+				goTo : function(url) {
+					window.location.href = url;
+				}
+
+			}
+		});
+	</script>
+</body>
+</html>

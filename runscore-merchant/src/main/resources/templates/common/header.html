@@ -1,0 +1,239 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta name="renderer" content="webkit|ie-comp|ie-stand" />
+<meta name="description" content="a31daeb0581dcf08de10e07d4f1aa971" />
+<script src="https://cdn.staticfile.org/layer/2.3/layer.js"></script>
+<link href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<style>
+@charset "UTF-8";
+
+[v-cloak] {
+	display: none;
+}
+
+.dropdown-item.active {
+	color: #fff !important;
+}
+
+.unread-msg-nav-item {
+	width: 70px;
+	text-align: center;
+}
+
+.unread-msg-nav-item .label {
+	background-color: #00a65a !important;
+	position: absolute;
+	top: 9px;
+	right: 5px;
+	text-align: center;
+	font-size: 9px;
+	padding: 2px 3px;
+	line-height: .9;
+	width: 21px;
+}
+
+.unread-msg-nav-item .dropdown-menu {
+	padding: 0;
+}
+
+.unread-msg-nav-item .dropdown-toggle::after {
+	border: 0;
+}
+
+.unread-msg-nav-item .card {
+	width: 280px;
+}
+
+.unread-msg-nav-item .card-body {
+	padding: 0;
+}
+
+.unread-msg-nav-item .card-header, .unread-msg-nav-item .card-footer {
+	padding: 0.30rem 0.70rem;
+}
+
+.unread-msg-nav-item .card-header {
+	border-bottom: 0;
+}
+
+.unread-msg-nav-item .card-footer {
+	background-color: #fff;
+	text-align: center;
+	cursor: pointer;
+	color: #3788ee;
+	border-top: unset;
+}
+
+.unreaded-msg {
+	cursor: pointer;
+	padding: 0 25px;
+	border-bottom: 1px solid #eee;
+	align-items: center;
+	display: flex;
+}
+
+.unreaded-msg:hover {
+	background: rgba(51, 51, 51, .08);
+}
+
+.unreaded-msg-title:before {
+	content: "";
+	position: absolute;
+	width: 5px;
+	height: 5px;
+	background: #f1556c;
+	border-radius: 5px;
+	left: -10px;
+	top: 5px;
+}
+
+.unreaded-msg-title {
+	margin: 8px 0;
+	position: relative;
+	font-size: 13px;
+}
+
+.unreaded-msg-desc {
+	margin: 8px 0;
+	font-size: 13px;
+	color: #868383;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 250px;
+}
+</style>
+</head>
+<body>
+	<div id="header" v-cloak>
+		<nav class="navbar navbar-expand-sm bg-info navbar-dark" style="justify-content: space-between;">
+			<ul class="navbar-nav">
+				<li class="nav-item" v-bind:class="{'active': currentPathName == '/statistical-analysis'}" v-on:click="navTo('/statistical-analysis')"><a class="nav-link">统计分析</a></li>
+				<li class="nav-item" v-bind:class="{'active': currentPathName == '/pay-online'}" v-on:click="navTo('/pay-online')"><a class="nav-link">收银台</a></li>
+				<!-- <li class="nav-item" v-bind:class="{'active': currentPathName == '/everyday-trade-situation'}" v-on:click="navTo('/everyday-trade-situation')"><a class="nav-link">每日交易情况</a></li> -->
+				<li class="nav-item" v-bind:class="{'active': currentPathName == '/apply-settlement'}" v-on:click="navTo('/apply-settlement')"><a class="nav-link">申请结算</a></li>
+				<li class="nav-item" v-bind:class="{'active': currentPathName == '/merchant-order'}" v-on:click="navTo('/merchant-order')"><a class="nav-link">商户订单</a></li>
+				<li class="nav-item" v-bind:class="{'active': currentPathName == '/appeal-record'}" v-on:click="navTo('/appeal-record')"><a class="nav-link">申诉记录</a></li>
+				<li class="nav-item" v-bind:class="{'active': currentPathName == '/merchant-info'}" v-on:click="navTo('/merchant-info')"><a class="nav-link">商户信息</a></li>
+				<li class="nav-item" v-bind:class="{'active': currentPathName == '/rate-details'}" v-on:click="navTo('/rate-details')"><a class="nav-link">费率详情</a></li>
+			</ul>
+			<ul class="navbar-nav" style="float: right;">
+				<li class="nav-item dropdown unread-msg-nav-item"><a class="nav-link dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bell"></i><span class="label label-success">{{todoAppealNum}}</span></a>
+					<div class="dropdown-menu dropdown-menu-right">
+						<div>
+							<div class="card">
+								<div class="card-header">你有{{todoAppealNum}}条未处理的申诉记录</div>
+								<div class="card-body">
+									<div class="unreaded-msg" v-for="todoAppeal in top5TodoAppeals" v-on:click="navTo('/appeal-details?id=' + todoAppeal.id)">
+										<div>
+											<p class="unreaded-msg-title">{{todoAppeal.merchantName}}</p>
+											<p class="unreaded-msg-desc">{{todoAppeal.appealTypeName}}</p>
+										</div>
+									</div>
+								</div>
+								<div class="card-footer" v-on:click="navTo('/appeal-record?appealState=1')">查看更多</div>
+							</div>
+						</div>
+					</div></li>
+				<li class="nav-item dropdown"><a class="nav-link dropdown-toggle" data-toggle="dropdown">{{merchantName}}</a>
+					<div class="dropdown-menu dropdown-menu-right">
+						<a class="dropdown-item" v-on:click="logout"><i class="fa fa-sign-out"></i>退出登录</a>
+					</div></li>
+			</ul>
+		</nav>
+		<template v-if="playAudioFlag"> <iframe autoplay="autoplay" src="audio/ring.wav" style="display: none;"></iframe> </template>
+	</div>
+	<script type="text/javascript">
+		var header = new Vue({
+			el : '#header',
+			data : {
+				merchantName : '',
+				currentPathName : '',
+				homePageUrl : '',
+				top5TodoAppeals : [],
+				todoAppealNum : sessionStorage.getItem('todoAppealNum') == null ? 0 : sessionStorage.getItem('todoAppealNum'),
+				playAudioFlag : false
+			},
+			computed : {},
+			created : function() {
+				var that = this;
+				that.currentPathName = window.location.pathname;
+				that.getUserAccountInfo();
+				that.loadTop5TodoAppealByPage();
+				window.setInterval(function() {
+					that.loadTop5TodoAppealByPage();
+				}, 5000);
+			},
+			methods : {
+				navTo : function(url) {
+					if(url == '/pay-online'){
+						var that = this;
+						if(localStorage.getItem("homePageUrl")){
+					        try{
+					        	that.homePageUrl = localStorage.getItem("homePageUrl");
+					        } catch(e){
+					           localStorage.removeItem('homePageUrl');
+					        }
+							window.open(that.homePageUrl+url,"_blank");
+					     }else{
+							that.$http.get('/dictconfig/findConfigItemByConfigCode?configCode=homePageUrl').then(function(res) {
+								if (res.body.data != null) {
+									that.homePageUrl = res.body.data.configValue;
+									localStorage.setItem('homePageUrl', that.homePageUrl);
+									window.open(that.homePageUrl+url,"_blank");
+								}
+							});
+					     }
+					}else{
+						window.location.href = url;
+					}
+				},
+
+				loadTop5TodoAppealByPage : function() {
+					var that = this;
+					that.$http.get('/appeal/findTop5TodoAppealByPage').then(function(res) {
+						that.playAudioFlag = false;
+						that.top5TodoAppeals = res.body.data.content;
+						var lastTimeTodoAppealNum = that.todoAppealNum;
+						that.todoAppealNum = res.body.data.total;
+						sessionStorage.setItem('todoAppealNum', that.todoAppealNum);
+						if (lastTimeTodoAppealNum != null && lastTimeTodoAppealNum < that.todoAppealNum) {
+							that.playAudioFlag = true;
+						}
+					});
+				},
+
+				/**
+				 * 获取商户账号信息
+				 */
+				getUserAccountInfo : function() {
+					var that = this;
+					that.$http.get('/merchant/getMerchantInfo').then(function(res) {
+						if (res.body.data == null) {
+							that.isLoggedInFlag = false;
+						} else {
+							that.merchantName = res.body.data.merchantName;
+						}
+					});
+				},
+
+				logout : function() {
+					this.$http.post('/logout').then(function(res) {
+						layer.open({
+							title : '提示',
+							icon : '1',
+							closeBtn : 0,
+							btn : [],
+							content : '退出成功!',
+							time : 2000,
+							end : function() {
+								window.location.href = '/login';
+							}
+						});
+					});
+				},
+			}
+		});
+	</script>
+</body>
+</html>

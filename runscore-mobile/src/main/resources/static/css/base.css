@@ -1,0 +1,117 @@
+* {
+    margin: 0;
+    padding: 0;
+    outline: none;
+    font-size:50px;
+    color: #333;
+    -webkit-font-smoothing: antialiased; /*字体锯齿*/
+    box-sizing: border-box; /*移动端防止溢出*/
+}
+
+html {
+    text-align: center;
+    height: 100%;
+    width: 100%;
+    font-size:50px;
+}
+
+html body {
+    font: 50px "Hiragino Sans GB W3","Microsoft YaHei","WenQuanYi Micro Hei",Arial,Helvetica,sans-serif;
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden
+}
+body{
+    background: #fff;
+    font-family: "Hiragino Sans GB W3","Microsoft YaHei","WenQuanYi Micro Hei",Arial,Helvetica,sans-serif;
+}
+
+ul, ol {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+p, span, li, a, h2, h3, h4,input{
+    font: 50px "Hiragino Sans GB W3","Microsoft YaHei","WenQuanYi Micro Hei",Arial,Helvetica,sans-serif;
+}
+
+input, textarea {
+    border: none;
+    background: none; /*设置高亮颜色*/
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+    -webkit-appearance: none;
+}
+
+div {
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+    -webkit-appearance: none;
+}
+
+img {
+    border: 0 none;
+}
+
+/*高度*/
+.heg1 {
+    height: 100%
+}
+
+/*宽度*/
+.wid1 {
+    width: 100%
+}
+
+/*外边距*/
+.marg1 {
+    margin-left: auto;
+    margin-right: auto
+}
+
+.clearfix:after {
+    content: "020";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+.clearfix {
+    zoom: 1;
+}
+
+/*内边距*/
+.clear {
+    clear: both
+}
+
+.hide {
+    display: none
+}
+
+.fl {
+    float: left
+}
+
+.fr {
+    float: right
+}
+
+input::-webkit-input-placeholder { /* WebKit browsers */
+    color: #B9B9B9;
+}
+
+input:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    color: #B9B9B9;
+}
+
+input::-moz-placeholder { /* Mozilla Firefox 19+ */
+    color: #B9B9B9;
+}
+
+input:-ms-input-placeholder {
+    color: #B9B9B9; /* Internet Explorer 10+ */
+}
+

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>团队业绩明细</title>
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/layer/2.3/layer.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<link href="/css/common/common.css" rel="stylesheet" type="text/css">
+<script src="/js/common/common.js"></script>
+<style type="text/css">
+.bounty-ranking-table {
+
+}
+
+.bounty-ranking-table th {
+	padding-top: 0.5rem;
+	padding-bottom: 0.5rem;
+}
+
+.bounty-ranking-table tr, .bounty-ranking-table td {
+	width: 16%;
+	text-align: start;
+	padding-top: 0.5rem;
+	padding-bottom: 0.5rem;
+}
+
+.bounty-ranking-table td {
+	padding-left: 0.5rem;
+}
+</style>
+</head>
+
+<body>
+	<div th:replace="common/header::html"></div>
+	<div id="index" v-cloak>
+		<div class="page-body">
+			<div class="card" v-show="showTodayBountyRankFlag">
+				<div class="card-header">
+					<span>今日团队业绩</span><span class="float-right" style="color: rgb(55, 170, 253); font-weight: bold;" v-on:click="showTotalTop10BountyRank">昨日团队业绩&gt;</span>
+				</div>
+				<div class="card-body" style="    padding: 0.5rem;">
+					<table class="table table-sm bounty-ranking-table" style="font-size: small;">
+						<thead>
+							<tr>
+								<th>账号</th>
+								<th>今日收款：{{todayCount}}</th>
+								<th>今日订单</th>
+								<th>今日成交</th>
+								<th>成功率</th>
+								<th>累计收款</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="(bountyRank,index) in totalReceiveResults">
+								<td :style="bountyRank.accountType == 'agent' ? 'color: red;' :''" v-on:click="toReceiveResults(bountyRank.id,bountyRank.accountType)">{{bountyRank.userName}}</td>
+								<td>{{bountyRank.todayTradeAmount}}</td>
+								<td>{{bountyRank.todayOrderNum}}</td>
+								<td>{{bountyRank.todayPaidOrderNum}}</td>
+								<td>{{bountyRank.todaySuccessRate}}</td>
+								<td>{{bountyRank.totalTradeAmount}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="card" v-show="!showTodayBountyRankFlag">
+				<div class="card-header">
+					<span>昨日团队业绩</span><span class="float-right" style="color: rgb(55, 170, 253); font-weight: bold;" v-on:click="showTodayTop10BountyRank">今日团队业绩&gt;</span>
+				</div>
+				<div class="card-body" style="    padding: 0.5rem;">
+					<table class="table table-sm bounty-ranking-table" style="font-size: small;">
+						<thead>
+							<tr>
+								<th>账号</th>
+								<th>昨日收款：{{yesterdayCount}}</th>
+								<th>昨日订单</th>
+								<th>昨日成交</th>
+								<th>成功率</th>
+								<th>累计收款</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="(bountyRank,index) in totalReceiveResults">
+								<td :style="bountyRank.accountType == 'agent' ? 'color: red;' :''" v-on:click="toReceiveResults(bountyRank.id,bountyRank.accountType)">{{bountyRank.userName}}</td>
+								<td>{{bountyRank.yesterdayTradeAmount}}</td>
+								<td>{{bountyRank.yesterdayOrderNum}}</td>
+								<td>{{bountyRank.yesterdayPaidOrderNum}}</td>
+								<td>{{bountyRank.yesterdaySuccessRate}}</td>
+								<td>{{bountyRank.totalTradeAmount}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div th:replace="common/footer::html"></div>
+	<link href="/css/common/theme-brown.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript">
+		var indexVM = new Vue({
+			el : '#index',
+			data : {
+				global : GLOBAL,
+				showTodayBountyRankFlag : true,
+				totalReceiveResults : []
+			},
+			computed : {
+				// 计算商品总价
+	            todayCount(){
+	                let totalprice = 0;
+	                // 遍历拿到每一个商品对象的价格 和 数量，然后把乘积返回
+	                this.totalReceiveResults.forEach(a =>{
+	                    totalprice += a.todayTradeAmount
+	                })
+	                return totalprice;
+	            },
+	            yesterdayCount(){
+	                let totalprice = 0;
+	                // 遍历拿到每一个商品对象的价格 和 数量，然后把乘积返回
+	                this.totalReceiveResults.forEach(a =>{
+	                    totalprice += a.yesterdayTradeAmount
+	                })
+	                return totalprice;
+	            }
+			},
+			created : function() {
+			},
+			mounted : function() {
+				headerVM.title = '团队业绩明细';
+				headerVM.showBackFlag = true;
+				this.loadTotalReceiveResults();
+			},
+			methods : {
+				loadTotalReceiveResults : function() {
+					var that = this;
+					layer.load();
+					that.$http.get('/statisticalAnalysis/findMyTotalReceiveResultsSituation').then(function(res) {
+						that.totalReceiveResults = res.body.data;
+						layer.closeAll('loading');
+					});
+				},
+				toReceiveResults : function(id,type) {
+					var that = this;
+					if(type == 'agent'){
+						layer.load();
+						that.$http.get('/statisticalAnalysis/findMyReceiveResultsSituation?id='+id).then(function(res) {
+							that.totalReceiveResults = res.body.data;
+							this.showTodayBountyRankFlag = true;
+							layer.closeAll('loading');
+						});
+					}
+				},
+				showTodayTop10BountyRank : function() {
+					this.showTodayBountyRankFlag = true;
+				},
+				showTotalTop10BountyRank : function() {
+					this.showTodayBountyRankFlag = false;
+				}
+			}
+		});
+	</script>
+</body>
+</html>

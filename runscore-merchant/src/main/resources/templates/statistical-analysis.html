@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<title>统计分析</title>
+<link href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<script src="https://cdn.staticfile.org/echarts/4.2.1-rc1/echarts.min.js"></script>
+<script src="https://cdn.staticfile.org/dayjs/1.7.8/dayjs.min.js"></script>
+<link href="/css/common/common.css" rel="stylesheet" type="text/css">
+<script src="/js/common/common.js"></script>
+<style type="text/css">
+.analysis-row1 {
+	margin-left: 20px;
+	margin-right: 20px;
+	padding-top: 20px;
+}
+
+.analysis-card {
+	color: #fff;
+	border-radius: 6px;
+	background: #2c3448;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	margin-right: 26px;
+}
+
+.analysis-card-gathering {
+	flex: 0 0 23%;
+	max-width: 23%;
+	margin-right: 34px;
+}
+
+.analysis-card-summary {
+	box-shadow: 0px 8px 6px #888888;
+}
+
+.analysis-card-channel {
+	background: #4c5052;
+}
+
+.analysis-card-gathering:last-child {
+	margin-right: 0px;
+}
+
+.analysis-card-row1 {
+	
+}
+
+.analysis-card-row2 {
+	padding-left: 33px;
+	font-size: 24px;
+	padding-bottom: 10px;
+	color: #26dad0;
+	font-weight: bold;
+}
+
+.analysis-card-row3 {
+	display: flex;
+	justify-content: space-between;
+}
+
+.index-label {
+	color: #999;
+}
+
+.index-value {
+	font-weight: bold;
+}
+
+.index-value-amount {
+	color: #26dad0;
+}
+
+.analysis-row2 {
+	margin-left: 20px;
+	margin-right: 20px;
+	padding-top: 20px;
+}
+
+.channel-name {
+	margin-left: 5rem;
+	color: #007bff;
+	font-weight: bold;
+}
+
+.poundage-and-actual-income {
+	justify-content: space-around;
+}
+
+.merchant-trade-situation-table {
+	border-bottom: 0 !important;
+}
+
+.merchant-trade-situation-table thead th {
+	border-bottom: 0;
+	text-align: center;
+	font-size: 14px;
+	font-weight: bold;
+	background: #2c3448;
+	color: #fff;
+	border-radius: 6px;
+}
+
+.merchant-trade-situation-table tr td {
+	text-align: center;
+	border-left: 0;
+	background: #2c3448;
+	color: #26dad0;
+	border-radius: 6px;
+}
+
+.report-title {
+	text-align: center;
+	margin-top: 20px;
+}
+
+.report-title span {
+	background: #2c3448;
+	color: #fff;
+	font-weight: bold;
+	display: inline-block;
+	min-width: 20rem;
+	border-radius: 20px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+}
+</style>
+</head>
+<body>
+	<div th:replace="common/header::html"></div>
+	<div id="statistical-analysis" v-cloak>
+		<div class="row analysis-row1">
+			<div class="col-sm-3 analysis-card analysis-card-summary analysis-card-gathering">
+				<div class="analysis-card-row1">累计交易金额</div>
+				<div class="analysis-card-row2">{{tradeSituation.totalTradeAmount}}{{global.systemSetting.currencyUnit}}</div>
+				<div class="analysis-card-row3 poundage-and-actual-income">
+					<div>
+						<div class="index-label">手续费</div>
+						<div class="index-value index-value-amount">{{tradeSituation.totalPoundage}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+					<div>
+						<div class="index-label">实收金额</div>
+						<div class="index-value index-value-amount">{{tradeSituation.totalActualIncome}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+				</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">已支付订单量</div>
+						<div class="index-value">{{tradeSituation.totalPaidOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">订单量</div>
+						<div class="index-value">{{tradeSituation.totalOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">成功率</div>
+						<div class="index-value">{{tradeSituation.totalSuccessRate}}%</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-3 analysis-card analysis-card-summary analysis-card-gathering">
+				<div class="analysis-card-row1">本月交易金额</div>
+				<div class="analysis-card-row2">{{tradeSituation.monthTradeAmount}}{{global.systemSetting.currencyUnit}}</div>
+				<div class="analysis-card-row3 poundage-and-actual-income">
+					<div>
+						<div class="index-label">手续费</div>
+						<div class="index-value index-value-amount">{{tradeSituation.monthPoundage}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+					<div>
+						<div class="index-label">实收金额</div>
+						<div class="index-value index-value-amount">{{tradeSituation.monthActualIncome}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+				</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">已支付订单量</div>
+						<div class="index-value">{{tradeSituation.monthPaidOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">订单量</div>
+						<div class="index-value">{{tradeSituation.monthOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">成功率</div>
+						<div class="index-value">{{tradeSituation.monthSuccessRate}}%</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-3 analysis-card analysis-card-summary analysis-card-gathering">
+				<div class="analysis-card-row1">昨日交易金额</div>
+				<div class="analysis-card-row2">{{tradeSituation.yesterdayTradeAmount}}{{global.systemSetting.currencyUnit}}</div>
+				<div class="analysis-card-row3 poundage-and-actual-income">
+					<div>
+						<div class="index-label">手续费</div>
+						<div class="index-value index-value-amount">{{tradeSituation.yesterdayPoundage}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+					<div>
+						<div class="index-label">实收金额</div>
+						<div class="index-value index-value-amount">{{tradeSituation.yesterdayActualIncome}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+				</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">已支付订单量</div>
+						<div class="index-value">{{tradeSituation.yesterdayPaidOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">订单量</div>
+						<div class="index-value">{{tradeSituation.yesterdayOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">成功率</div>
+						<div class="index-value">{{tradeSituation.yesterdaySuccessRate}}%</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-3 analysis-card analysis-card-summary analysis-card-gathering">
+				<div class="analysis-card-row1">今日交易金额</div>
+				<div class="analysis-card-row2">{{tradeSituation.todayTradeAmount}}{{global.systemSetting.currencyUnit}}</div>
+				<div class="analysis-card-row3 poundage-and-actual-income">
+					<div>
+						<div class="index-label">手续费</div>
+						<div class="index-value index-value-amount">{{tradeSituation.todayPoundage}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+					<div>
+						<div class="index-label">实收金额</div>
+						<div class="index-value index-value-amount">{{tradeSituation.todayActualIncome}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+				</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">已支付订单量</div>
+						<div class="index-value">{{tradeSituation.todayPaidOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">订单量</div>
+						<div class="index-value">{{tradeSituation.todayOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">成功率</div>
+						<div class="index-value">{{tradeSituation.todaySuccessRate}}%</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="report-title">
+			<span>各通道交易情况</span>
+		</div>
+		<div class="row analysis-row1" v-for="tradeSituation in channelTradeSituations">
+			<div class="col-sm-3 analysis-card analysis-card-gathering analysis-card-channel">
+				<div class="analysis-card-row1">
+					<span>累计交易金额</span><span class="channel-name">{{tradeSituation.channelName}}</span>
+				</div>
+				<div class="analysis-card-row2">{{tradeSituation.totalTradeAmount}}{{global.systemSetting.currencyUnit}}</div>
+				<div class="analysis-card-row3 poundage-and-actual-income">
+					<div>
+						<div class="index-label">手续费</div>
+						<div class="index-value index-value-amount">{{tradeSituation.totalPoundage}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+					<div>
+						<div class="index-label">实收金额</div>
+						<div class="index-value index-value-amount">{{tradeSituation.totalActualIncome}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+				</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">已支付订单量</div>
+						<div class="index-value">{{tradeSituation.totalPaidOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">订单量</div>
+						<div class="index-value">{{tradeSituation.totalOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">成功率</div>
+						<div class="index-value">{{tradeSituation.totalSuccessRate}}%</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-3 analysis-card analysis-card-gathering analysis-card-channel">
+				<div class="analysis-card-row1">
+					<span>本月交易金额</span><span class="channel-name">{{tradeSituation.channelName}}</span>
+				</div>
+				<div class="analysis-card-row2">{{tradeSituation.monthTradeAmount}}{{global.systemSetting.currencyUnit}}</div>
+				<div class="analysis-card-row3 poundage-and-actual-income">
+					<div>
+						<div class="index-label">手续费</div>
+						<div class="index-value index-value-amount">{{tradeSituation.monthPoundage}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+					<div>
+						<div class="index-label">实收金额</div>
+						<div class="index-value index-value-amount">{{tradeSituation.monthActualIncome}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+				</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">已支付订单量</div>
+						<div class="index-value">{{tradeSituation.monthPaidOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">订单量</div>
+						<div class="index-value">{{tradeSituation.monthOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">成功率</div>
+						<div class="index-value">{{tradeSituation.monthSuccessRate}}%</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-3 analysis-card analysis-card-gathering analysis-card-channel">
+				<div class="analysis-card-row1">
+					<span>昨日交易金额</span><span class="channel-name">{{tradeSituation.channelName}}</span>
+				</div>
+				<div class="analysis-card-row2">{{tradeSituation.yesterdayTradeAmount}}{{global.systemSetting.currencyUnit}}</div>
+				<div class="analysis-card-row3 poundage-and-actual-income">
+					<div>
+						<div class="index-label">手续费</div>
+						<div class="index-value index-value-amount">{{tradeSituation.yesterdayPoundage}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+					<div>
+						<div class="index-label">实收金额</div>
+						<div class="index-value index-value-amount">{{tradeSituation.yesterdayActualIncome}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+				</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">已支付订单量</div>
+						<div class="index-value">{{tradeSituation.yesterdayPaidOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">订单量</div>
+						<div class="index-value">{{tradeSituation.yesterdayOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">成功率</div>
+						<div class="index-value">{{tradeSituation.yesterdaySuccessRate}}%</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-3 analysis-card analysis-card-gathering analysis-card-channel">
+				<div class="analysis-card-row1">
+					<span>今日交易金额</span><span class="channel-name">{{tradeSituation.channelName}}</span>
+				</div>
+				<div class="analysis-card-row2">{{tradeSituation.todayTradeAmount}}{{global.systemSetting.currencyUnit}}</div>
+				<div class="analysis-card-row3 poundage-and-actual-income">
+					<div>
+						<div class="index-label">手续费</div>
+						<div class="index-value index-value-amount">{{tradeSituation.todayPoundage}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+					<div>
+						<div class="index-label">实收金额</div>
+						<div class="index-value index-value-amount">{{tradeSituation.todayActualIncome}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+				</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">已支付订单量</div>
+						<div class="index-value">{{tradeSituation.todayPaidOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">订单量</div>
+						<div class="index-value">{{tradeSituation.todayOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">成功率</div>
+						<div class="index-value">{{tradeSituation.todaySuccessRate}}%</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row analysis-row2">
+			<div class="col-sm-6" id="total-bounty-rank-chart" style="height: 300px;"></div>
+			<div class="col-sm-6" id="today-bounty-rank-chart" style="height: 300px;"></div>
+		</div>
+	</div>
+	<script src="/js/statistical-analysis.js"></script>
+</body>
+</html>

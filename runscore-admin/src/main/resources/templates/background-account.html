@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<title>后台账号</title>
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<script src="https://cdn.staticfile.org/dayjs/1.7.8/dayjs.min.js"></script>
+<link rel="stylesheet" href="https://cdn.staticfile.org/bootstrap-table/1.13.1/bootstrap-table.min.css">
+<script src="https://cdn.staticfile.org/bootstrap-table/1.13.1/bootstrap-table.min.js"></script>
+<script src="https://cdn.staticfile.org/bootstrap-table/1.13.1/locale/bootstrap-table-zh-CN.min.js"></script>
+<link href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<script src="https://unpkg.com/art-template@4.13.2/lib/template-web.js"></script>
+<link href="https://cdn.staticfile.org/orgchart/2.1.5/css/jquery.orgchart.min.css" rel="stylesheet">
+<script src="https://cdn.staticfile.org/orgchart/2.1.5/js/jquery.orgchart.min.js"></script>
+<script src="https://cdn.staticfile.org/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+<link href="/css/common/common.css" rel="stylesheet" type="text/css">
+<script src="/js/common/common.js"></script>
+<script id="account-action" type="text/html">
+<button type="button" class="btn btn-sm btn-link" onclick="accountManageVM.showAccountEditModal('{{accountInfo.id }}')">编辑</button>
+<div class="dropdown">
+  <button class="btn btn-sm btn-link dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    更多
+  </button>
+  <div class="dropdown-menu">
+    <button class="dropdown-item" type="button" onclick="accountManageVM.showModifyLoginPwdModal('{{accountInfo.id }}')">修改登录密码</button>
+	<button class="dropdown-item" type="button" onclick="accountManageVM.showBindGoogleAuthModal('{{accountInfo.id }}', '{{accountInfo.userName }}')">绑定谷歌验证器</button>
+	<button class="dropdown-item" type="button" onclick="accountManageVM.delAccount('{{accountInfo.id }}')">删除账号</button>
+  </div>
+</div>
+</script>
+<style type="text/css">
+ #background-account .fixed-table-container {
+	height: 33rem;
+}
+
+/* .bootstrap-table .fixed-table-container {
+	padding-bottom: 0px!important;
+} */
+
+.account-manage-table .dropdown {
+	display: inline-block;
+}
+
+.account-manage-table .dropdown-item {
+	cursor: pointer;
+}
+
+.account-manage-table .user-name {
+	color: #ec494c;
+}
+
+.add-account-modal-dialog {
+	max-width: 100%;
+	width: 40%;
+}
+
+.add-account-modal-dialog .modal-body {
+	height: 28rem;
+	overflow: auto;
+}
+
+.account-edit-modal-dialog {
+	max-width: 100%;
+	width: 40%;
+}
+</style>
+</head>
+
+<body>
+	<div th:replace="common/header::html"></div>
+	<div id="background-account" v-cloak>
+		<form class="form-inline common-query-cond-form" action="#">
+			<div class="form-group common-query-cond">
+				<label>用户名:</label><input type="text" class="form-control-sm" v-model="userName">
+			</div>
+			<div class="form-group common-query-cond">
+				<label>真实姓名:</label><input type="text" class="form-control-sm" v-model="realName">
+			</div>
+			<div class="form-group common-query-cond">
+				<label>所属代理:</label><input type="text" class="form-control-sm" v-model="viterUserName">
+			</div>
+			<button type="button" class="btn btn-danger btn-sm" v-on:click="refreshTable">搜索</button>
+		</form>
+		<form class="form-inline common-query-cond-form float-right" action="#">
+			<button type="button" class="btn btn-info btn-sm" v-on:click="openAddAccountModal">新增账号</button>
+		</form>
+		<table class="common-table account-manage-table"></table>
+		<div v-if="addUserAccountFlag">
+			<div class="modal-mask">
+				<div class="modal-wrapper">
+					<div class="modal-dialog add-account-modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">新增账号</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="addUserAccountFlag = false">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<form>
+									<div class="form-group row">
+										<div class="col-sm-12">
+											<label>邀请人:</label> <input type="text" class="form-control" v-model="selectedAccount.inviterUserName">
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-12">
+											<label>用户名:</label> <input type="text" class="form-control" v-model="selectedAccount.userName">
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-12">
+											<label>真实姓名:</label> <input type="text" class="form-control" v-model="selectedAccount.realName">
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-12">
+											<label>手机号:</label> <input type="text" class="form-control" v-model="selectedAccount.mobile">
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-12">
+											<label>登录密码:</label> <input type="text" class="form-control" v-model="selectedAccount.loginPwd">
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-6">
+											<label>账号类型:</label>
+											<div>
+												<select class="form-control" v-model="selectedAccount.accountType">
+													<option value="">请选择</option>
+													<option v-for="dictItem in accountTypeDictItems" :value="dictItem.dictItemCode">{{dictItem.dictItemName}}</option>
+												</select>
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<label>状态:</label>
+											<div>
+												<template v-for="dictItem in accountStateDictItems">
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" class="custom-control-input" :id="'accountState' + dictItem.dictItemCode" v-model="selectedAccount.state" :value="dictItem.dictItemCode"> <label class="custom-control-label" :for="'accountState' + dictItem.dictItemCode">{{dictItem.dictItemName}}</label>
+												</div>
+												</template>
+											</div>
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-6">
+											<label>账号权限:</label>
+											<div>
+												<select class="form-control" v-model="selectedAccount.roleId">
+													<option v-for="dictItem in accountRole" :value="dictItem.id">{{dictItem.name}}</option>
+												</select>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-success btn-sm" v-on:click="addUserAccount">保存</button>
+								<button type="button" class="btn btn-sm" v-on:click="addUserAccountFlag = false">取消</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div v-if="accountEditFlag">
+			<div class="modal-mask">
+				<div class="modal-wrapper">
+					<div class="modal-dialog account-edit-modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">账号编辑</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="accountEditFlag = false">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<form>
+									<div class="form-group row">
+										<div class="col-sm-12">
+											<label>用户名:</label> <input type="text" class="form-control" v-model="selectedAccount.userName">
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-12">
+											<label>真实姓名:</label> <input type="text" class="form-control" v-model="selectedAccount.realName">
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-12">
+											<label>手机号:</label> <input type="text" class="form-control" v-model="selectedAccount.mobile">
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-6">
+											<label>账号类型:</label>
+											<div>
+												<select class="form-control" v-model="selectedAccount.accountType">
+													<option value="">请选择</option>
+													<option v-for="dictItem in accountTypeDictItems" :value="dictItem.dictItemCode">{{dictItem.dictItemName}}</option>
+												</select>
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<label>状态:</label>
+											<div>
+												<template v-for="dictItem in accountStateDictItems">
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" class="custom-control-input" :id="'accountState' + dictItem.dictItemCode" v-model="selectedAccount.state" :value="dictItem.dictItemCode"> <label class="custom-control-label" :for="'accountState' + dictItem.dictItemCode">{{dictItem.dictItemName}}</label>
+												</div>
+												</template>
+											</div>
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-6">
+											<label>账号权限:</label>
+											<div>
+												<select class="form-control" v-model="selectedAccount.roleId">
+													<option v-for="dictItem in accountRole" :value="dictItem.id">{{dictItem.name}}</option>
+												</select>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-success btn-sm" v-on:click="updateUserAccount">保存</button>
+								<button type="button" class="btn btn-sm" v-on:click="accountEditFlag = false">取消</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div v-if="bindGoogleAuthFlag">
+			<div class="modal-mask">
+				<div class="modal-wrapper">
+					<div class="modal-dialog modify-login-pwd-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">绑定谷歌验证器</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="bindGoogleAuthFlag = false">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<div>请打开谷歌验证器APP，选择"扫描二维码"，或手动输入密钥</div>
+								<div style="padding-left: 2rem;">
+									<label style="padding-right: 1rem; margin-bottom: 0;">后台账号:</label><span>{{userNameWithGoogleAuth}}</span>
+								</div>
+								<div style="padding-left: 2rem; padding-right: 2rem;">
+									<label style="padding-right: 1rem; margin-bottom: 0;">谷歌密钥:</label><span>{{googleSecretKey}}</span>
+									<button type="button" class="btn btn-primary btn-sm" style="float: right;" v-on:click="generateGoogleSecretKey">更换密钥</button>
+								</div>
+								<div style="text-align: center; padding-top: 0.5rem; padding-bottom: 0.5rem;">
+									<div class="code-content"></div>
+								</div>
+								<div>请输入6位数字谷歌验证码完成绑定操作</div>
+								<div>
+									<input type="text" class="form-control" v-model="googleVerCode" placeholder="请输入谷歌验证码">
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-success btn-sm" v-on:click="bindGoogleAuth">确定</button>
+								<button type="button" class="btn btn-sm" v-on:click="bindGoogleAuthFlag = false">取消</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div v-if="modifyLoginPwdFlag">
+			<div class="modal-mask">
+				<div class="modal-wrapper">
+					<div class="modal-dialog modify-login-pwd-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">修改登录密码</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="modifyLoginPwdFlag = false">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<form>
+									<div class="form-group row">
+										<div class="col-sm-12">
+											<label>用户名:</label> <input type="text" class="form-control" v-model="selectedAccount.userName" disabled>
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-12">
+											<label>真实姓名:</label> <input type="text" class="form-control" v-model="selectedAccount.realName" disabled>
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-12">
+											<label>登录密码:</label> <input type="text" class="form-control" v-model="newLoginPwd" placeholder="请输入要修改的密码">
+										</div>
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-success btn-sm" v-on:click="modifyLoginPwd">保存</button>
+								<button type="button" class="btn btn-sm" v-on:click="modifyLoginPwdFlag = false">取消</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div v-if="bankCardFlag">
+			<div class="modal-mask">
+				<div class="modal-wrapper">
+					<div class="modal-dialog" style="max-width: 100%; width: 40%;">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">我的银行卡</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="bankCardFlag = false">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<table class="table table-sm common-table">
+									<thead>
+										<tr>
+											<th>开户人</th>
+											<th>开户银行</th>
+											<th>卡号</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="(bankCard, index) in bankCards">
+											<td>{{bankCard.accountHolder}}</td>
+											<td>{{bankCard.openAccountBank}}</td>
+											<td>{{bankCard.bankCardAccount}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-sm" v-on:click="bankCardFlag = false">返回</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div v-if="userCardFlag">
+			<div class="modal-mask">
+				<div class="modal-wrapper">
+					<div class="modal-dialog" style="max-width: 100%; width: 40%;">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">实名认证</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="userCardFlag = false">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<div v-if="cardWithStorageId != null">
+									手持身份证：<img :src="getImgUrl(cardWithStorageId)" style="height: 30%;width: 30%"/><br/>
+									身份证正面：<img :src="getImgUrl(cardIsStorageId)" style="height: 30%;width: 30%"/><br/>
+									身份证反面：<img :src="getImgUrl(cardTheStorageId)" style="height: 30%;width: 30%"/>
+								<div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-sm" v-on:click="userCardFlag = false">返回</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div v-if="virtualWalletFlag">
+			<div class="modal-mask">
+				<div class="modal-wrapper">
+					<div class="modal-dialog" style="max-width: 100%; width: 40%;">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">我的电子钱包</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="virtualWalletFlag = false">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<table class="table table-sm common-table">
+									<thead>
+										<tr>
+											<th>钱包类型</th>
+											<th>钱包地址</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="(virtualWallet, index) in virtualWallets">
+											<td>{{virtualWallet.virtualWalletType}}</td>
+											<td>{{virtualWallet.virtualWalletAddr}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-sm" v-on:click="virtualWalletFlag = false">返回</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="/js/background-account.js"></script>
+</body>
+</html>

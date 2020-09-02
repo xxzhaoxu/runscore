@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>提现</title>
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<link href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<script src="https://cdn.staticfile.org/layer/2.3/layer.js"></script>
+<script src="/js/common/common.js"></script>
+<link href="/css/common/common.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+.header-navbar {
+	color: white;
+	display: block;
+	text-align: center;
+	height: 2.5rem;
+	line-height: 1rem;
+	background-color: #dc3545;
+}
+.withdraw-container {
+	padding-top: 7rem;
+}
+
+.withdraw-container button {
+	margin-bottom: 1.5rem;
+	background-color: #37a5fd;
+	color: #fff;
+}
+</style>
+</head>
+
+<body>
+	<div th:replace="common/header::html"></div>
+	<div id="withdraw" v-cloak>
+		<div class="page-body">
+			<div class="container withdraw-container">
+				<form>
+					<button type="button" class="btn btn-lg btn-block" v-on:click="headerVM.goTo('/withdraw-bank-card')">提现到银行卡</button>
+					<button type="button" class="btn btn-lg btn-block" v-on:click="headerVM.goTo('/withdraw-virtual-wallet')">提现到电子钱包</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	<link href="/css/common/theme-brown.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript">
+		var withdrawVM = new Vue({
+			el : '#withdraw',
+			data : {},
+			computed : {},
+			created : function() {
+			},
+			mounted : function() {
+				headerVM.title = '提现';
+				headerVM.showBackFlag = true;
+			},
+			methods : {}
+		});
+	</script>
+</body>
+</html>

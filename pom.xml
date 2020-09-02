@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>me.zohar</groupId>
+	<artifactId>runscore</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<properties>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<spring-boot.version>2.1.1.RELEASE</spring-boot.version>
+	</properties>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.1.RELEASE</version>
+		<relativePath />
+	</parent>
+
+	<modules>
+		<module>runscore-api</module>
+		<module>runscore-mobile</module>
+		<module>runscore-admin</module>
+		<module>runscore-merchant</module>
+	</modules>
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>com.github.wvengen</groupId>
+					<artifactId>proguard-maven-plugin</artifactId>
+					<version>2.0.14</version>
+					<dependencies>
+						<dependency>
+							<groupId>net.sf.proguard</groupId>
+							<artifactId>proguard-base</artifactId>
+							<version>6.0.2</version>
+							<scope>runtime</scope>
+						</dependency>
+					</dependencies>
+					<executions>
+						<execution>
+							<phase>package</phase>
+							<goals>
+								<goal>proguard</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<obfuscate>true</obfuscate>
+						<options>
+							<option>-ignorewarnings</option>
+							<option>-verbose</option>
+							<option>-dontoptimize</option>
+							<option>-keepattributes
+								Exceptions,InnerClasses,Signature,Deprecated,
+								SourceFile,LineNumberTable,*Annotation*,EnclosingMethod</option>
+							<option>-keepdirectories</option>
+							<option>-dontskipnonpubliclibraryclasses</option>
+							<option>-keeppackagenames me.zohar.**</option>
+							<option>-keep public class * {
+								public protected *;
+								}</option>
+							<option>-keep public @interface * {
+								** default (*);
+								}</option>
+							<option>-keepclassmembers enum * {
+								public static **[] values();
+								public static ** valueOf(java.lang.String);
+								}</option>
+							<option>-keepclassmembers class * {
+								@org.springframework.beans.factory.annotation.Autowired *;
+								@javax.annotation.Resource *;
+								}</option>
+							<option>-optimizations !class/marking/final</option>
+							<option>-keep class me.zohar.runscore.**.domain.** { *; }</option>
+							<option>-keep class me.zohar.runscore.**.param.** { *; }</option>
+							<option>-keep class me.zohar.runscore.**.vo.** { *; }</option>
+							<option>-keep class !me.zohar.** { *; }</option>
+						</options>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>

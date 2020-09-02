@@ -1,0 +1,74 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+</head>
+<body>
+
+	<div id="footer" v-cloak>
+		<div class="footer" >
+		<ul  v-show="showFooterFlag" >
+			<li>
+				<a href="#" v-show="global.systemSetting.showRankingListFlag" v-on:click="goTo('/ranking-list')"  v-if="currentPathName == '/ranking-list'" >
+					<img src="images/paihangbang.png "/>
+					<p class="font-bot active-bot">排行榜</p>
+				</a>
+				<a href="#" v-show="global.systemSetting.showRankingListFlag" v-on:click="goTo('/ranking-list')"  v-else >
+					<img src="images/paihangbang1.png"/>
+					<p class="font-bot">排行榜</p>
+				</a>
+			</li>
+			<li>
+				<a href="#" v-on:click="goTo('/receive-order')" v-if="currentPathName == '/receive-order'" >
+					<img  src="images/jiedan2.png "/>
+					<p class="font-bot active-bot">接单</p>
+				</a>
+				<a href="#" v-on:click="goTo('/receive-order')" v-else>
+					<img src="images/jiedan.png"/>
+					<p class="font-bot">接单</p>
+				</a>
+			</li>
+			<li>
+				<a href="#"  v-on:click="goTo('/audit-order')"  v-if="currentPathName == '/audit-order'" >
+					<img  src="images/shenhe2.png"/>
+					<p class="font-bot active-bot">审核</p>
+				</a>
+				<a href="#"  v-on:click="goTo('/audit-order')"  v-else>
+					<img src="images/shenhe.png"/>
+					<p class="font-bot">审核</p>
+				</a>
+			</li>
+			<li>
+				<a href="#" v-on:click="goTo('/my-home-page')" v-if="currentPathName == '/my-home-page'">
+						<img src="images/wode2.png"/>
+						<p class="font-bot active-bot">我的</p>
+				</a>
+				<a href="#" v-on:click="goTo('/my-home-page')"  v-else >
+					<img src="images/wode.png"/>
+					<p class="font-bot">我的</p>
+				</a>
+
+			</li>
+		</ul>
+	</div>
+	</div>
+	<script type="text/javascript">
+		var footerVM = new Vue({
+			el : '#footer',
+			data : {
+				global : GLOBAL,
+				currentPathName : '',
+				showFooterFlag : true
+			},
+			computed : {},
+			created : function() {
+				this.currentPathName = window.location.pathname;
+			},
+			methods : {
+				goTo : function(url) {
+					window.location.href = url;
+				}
+			}
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<title>商户信息</title>
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<link href="/css/common/common.css" rel="stylesheet" type="text/css">
+<script src="/js/common/common.js"></script>
+<style type="text/css">
+.merchant-info-item {
+	font-size: 18px;
+	padding-bottom: 28px;
+}
+
+.merchant-info-label {
+	text-align: right;
+	padding-right: 20px;
+	color: #757b82;
+}
+
+.merchant-info-value {
+	color: #212529;
+}
+</style>
+</head>
+
+<body>
+	<div th:replace="common/header::html"></div>
+	<div id="merchant-info" v-cloak>
+		<ul class="nav common-tab">
+			<li class="nav-item" v-bind:class="{'selected-tab-item': selectedTab == 'merchantInfo'}" v-on:click="selectedTab = 'merchantInfo'"><a class="nav-link">商户信息</a></li>
+			<li class="nav-item" v-bind:class="{'selected-tab-item': selectedTab == 'bankCardManage'}" v-on:click="selectedTab = 'bankCardManage'"><a class="nav-link">银行卡管理</a></li>
+		</ul>
+		<form class="form-inline common-query-cond-form float-right" v-show="selectedTab == 'bankCardManage'">
+			<button type="button" class="btn btn-info btn-sm" v-on:click="showAddBankInfoModal">新增银行卡</button>
+		</form>
+		<div class="card" v-show="selectedTab == 'merchantInfo'">
+			<div class="card-body">
+				<div class="row merchant-info-item">
+					<div class="col-sm-4 merchant-info-label">用户名:</div>
+					<div class="col-sm-6 merchant-info-value">{{merchantInfo.userName}}</div>
+				</div>
+				<div class="row merchant-info-item">
+					<div class="col-sm-4 merchant-info-label">商户号:</div>
+					<div class="col-sm-6 merchant-info-value">{{merchantInfo.merchantNum}}</div>
+				</div>
+				<div class="row merchant-info-item">
+					<div class="col-sm-4 merchant-info-label">商户名称:</div>
+					<div class="col-sm-6 merchant-info-value">{{merchantInfo.merchantName}}</div>
+				</div>
+				<div class="row merchant-info-item">
+					<div class="col-sm-4 merchant-info-label">接入密钥:</div>
+					<div class="col-sm-6 merchant-info-value">{{merchantInfo.secretKey}}</div>
+				</div>
+				<div class="row merchant-info-item">
+					<div class="col-sm-4 merchant-info-label">创建时间:</div>
+					<div class="col-sm-6 merchant-info-value">{{merchantInfo.createTime}}</div>
+				</div>
+				<div class="row merchant-info-item">
+					<div class="col-sm-4 merchant-info-label">最近登录时间:</div>
+					<div class="col-sm-6 merchant-info-value">{{merchantInfo.latelyLoginTime}}</div>
+				</div>
+				<div class="row merchant-info-item">
+					<div class="offset-md-4">
+						<button type="button" class="btn btn-outline-secondary" v-on:click="showModifyLoginPwdModal">修改登录密码</button>
+						<button type="button" class="btn btn-outline-secondary" v-on:click="showModifyMoneyPwdModal">修改资金密码</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div v-show="selectedTab == 'bankCardManage'">
+			<table class="table table-hover common-table">
+				<thead>
+					<tr>
+						<th>开户银行</th>
+						<th>开户姓名</th>
+						<th>银行卡号</th>
+						<th>最近修改时间</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="merchantBankCard in merchantBankCards">
+						<td>{{merchantBankCard.openAccountBank}}</td>
+						<td>{{merchantBankCard.accountHolder}}</td>
+						<td>{{merchantBankCard.bankCardAccount}}</td>
+						<td>{{merchantBankCard.bankInfoLatelyModifyTime}}</td>
+						<td><button type="button" class="btn btn-outline-success btn-sm" v-on:click="showEditBankCardModal(merchantBankCard.id)">编辑</button>
+							<button type="button" class="btn btn-outline-danger btn-sm" v-on:click="delBankCard(merchantBankCard.id)">删除</button></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div v-if="modifyLoginPwdFlag">
+			<div class="modal-mask">
+				<div class="modal-wrapper">
+					<div class="modal-dialog modify-login-pwd-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">修改登录密码</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="modifyLoginPwdFlag = false">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<form>
+									<div class="form-group row">
+										<div class="col-sm-12">
+											<label>旧的登录密码:</label> <input type="password" class="form-control" v-model="oldLoginPwd" placeholder="请输入旧的登录密码">
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-12">
+											<label>登录密码:</label> <input type="password" class="form-control" v-model="newLoginPwd" placeholder="请输入要修改的密码">
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-12">
+											<label>确认登录密码:</label> <input type="password" class="form-control" v-model="confirmLoginPwd" placeholder="请再次确认密码">
+										</div>
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-success btn-sm" v-on:click="modifyLoginPwd">保存</button>
+								<button type="button" class="btn btn-sm" v-on:click="modifyLoginPwdFlag = false">取消</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div v-if="modifyMoneyPwdFlag">
+			<div class="modal-mask">
+				<div class="modal-wrapper">
+					<div class="modal-dialog modify-login-pwd-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">修改资金密码</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="modifyMoneyPwdFlag = false">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<form>
+									<div class="form-group row">
+										<div class="col-sm-12">
+											<label>旧的资金密码:</label> <input type="password" class="form-control" v-model="oldMoneyPwd" placeholder="请输入旧的资金密码">
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-12">
+											<label>资金密码:</label> <input type="password" class="form-control" v-model="newMoneyPwd" placeholder="请输入要修改的密码">
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-12">
+											<label>确认资金密码:</label> <input type="password" class="form-control" v-model="confirmMoneyPwd" placeholder="请再次确认密码">
+										</div>
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-success btn-sm" v-on:click="modifyMoneyPwd">保存</button>
+								<button type="button" class="btn btn-sm" v-on:click="modifyMoneyPwdFlag = false">取消</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div v-if="editBankInfoFlag">
+			<div class="modal-mask">
+				<div class="modal-wrapper">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">{{bankCardActionTitle}}</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="editBankInfoFlag = false">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<form>
+									<div class="form-group row">
+										<div class="col-sm-12">
+											<label>开户银行:</label> <input type="text" class="form-control" v-model="editBankInfo.openAccountBank">
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-12">
+											<label>开户姓名:</label> <input type="text" class="form-control" v-model="editBankInfo.accountHolder">
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-12">
+											<label>银行卡号:</label> <input type="text" class="form-control" v-model="editBankInfo.bankCardAccount">
+										</div>
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-success btn-sm" v-on:click="saveBankInfo">保存</button>
+								<button type="button" class="btn btn-sm" v-on:click="editBankInfoFlag = false">取消</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="/js/merchant-info.js"></script>
+</body>
+</html>

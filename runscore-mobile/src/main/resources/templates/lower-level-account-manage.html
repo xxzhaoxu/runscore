@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>下级账号管理</title>
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<script src="https://cdn.staticfile.org/layer/2.3/layer.js"></script>
+<script src="/js/common/common.js"></script>
+<link href="/css/common/common.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+.form-details-item label {
+	width: 7rem;
+}
+
+.form-details-item p {
+	display: inline;
+	padding-right: 3rem;
+}
+
+.channel-table {
+	border-bottom: 0 !important;
+}
+
+.channel-table thead th {
+	border-top: 0;
+	border-bottom: 0;
+	text-align: center;
+	color: #666;
+	font-size: 14px;
+	font-weight: normal;
+	background-color: #e2e2e2;
+}
+
+.channel-table tr td {
+	text-align: center;
+	border-top: 0;
+	color: #666;
+	border-bottom: 1px dashed #f8f9fa;
+	border-left: 0;
+	background: #f8f9fa;
+}
+
+.channel-table input {
+	text-align: center;
+}
+</style>
+</head>
+
+<body>
+	<div th:replace="common/header::html"></div>
+	<div id="lowerLevelAccountManage" v-cloak>
+		<div class="page-body" style="background: #f2f2f2;" v-show="accountManageFlag">
+			<div class="input-group" style="padding-bottom: 0.3rem; padding-top: 0.3rem;">
+				<select class="form-control" style="width: 10rem; height: 3rem;" v-model="queryScope">
+					<option v-for="dictItem in queryScopeDictItems" :value="dictItem.dictItemCode">{{dictItem.dictItemName}}</option>
+				</select> <input type="text" class="form-control" style="width: 8rem;" v-model="userName" placeholder="用户名">
+				<div class="input-group-append">
+					<button class="btn btn-outline-secondary" type="button" v-on:click="query">查询</button>
+				</div>
+			</div>
+			<div class="form-details" v-for="account in accounts">
+				<div class="form-details-body">
+					<div class="form-details-item form-details-item-sm">
+						<label>用户名:</label> <span>{{account.userName}}</span><label class="form-details-item-highlight">{{accountTypeFormat(account)}}</label>
+					</div>
+					<div class="form-details-item form-details-item-sm">
+						<label>账号状态:</label> <span class="form-details-item-highlight">{{state(account.state)}}</span>
+					</div>
+					<div class="form-details-item form-details-item-sm">
+						<label>账户余额:</label> <span class="form-details-item-highlight">{{account.cashDeposit}}</span>
+					</div>
+					<div class="form-details-item form-details-item-sm">
+						<label>注册时间:</label> <span>{{account.registeredTime}}</span>
+					</div>
+					<div class="form-details-item form-details-item-sm">
+						<label>最近登录时间:</label> <span>{{account.latelyLoginTime}}</span>
+					</div>
+					<div class="form-details-item form-details-item-sm form-details-item-highlight" v-for="receiveOrderChannel in account.receiveOrderChannels">
+						<label>{{receiveOrderChannel.channelName}}返点:</label> <span><p>{{receiveOrderChannel.rebate}}</p>
+							<p>{{receiveOrderChannel.stateName}}</p></span>
+					</div>
+
+					<div class="form-details-item form-details-item-sm">
+						<button  class="btn btn-outline-info" type="button" v-on:click="showAdjustRebatePage(account)">调整返点</button>
+						 <button  class="btn btn-outline-danger" type="button" v-on:click="showManualTopScorePage(account)">手动上分</button>
+						<button  class="btn btn-outline-danger" type="button" v-on:click="showManualState(account)">{{stateName(account.state)}}</button>
+					</div>
+				</div>
+			</div>
+			<div style="padding-left: 13rem;">
+				<ul class="pagination">
+					<li class="page-item"><a class="page-link" v-show="totalPage > 0 && pageNum > 1" v-on:click="prePage">上一页</a></li>
+					<li class="page-item"><a class="page-link" v-show="pageNum >= 1 && pageNum < totalPage" v-on:click="nextPage">下一页</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="page-body" style="background: #f2f2f2;" v-show="adjustRebateFlag">
+			<div class="form-details">
+				<div class="form-details-body">
+					<div class="form-details-item form-details-item-sm">
+						<label>用户名:</label> <span>{{selectedAccount.userName}}</span><label class="form-details-item-highlight">{{accountTypeFormat(selectedAccount)}}</label>
+					</div>
+					<div class="form-details-item form-details-item-sm">
+						<label>账户余额:</label> <span class="form-details-item-highlight">{{selectedAccount.cashDeposit}}</span>
+					</div>
+					<div class="form-details-item form-details-item-sm">
+						<label>注册时间:</label> <span>{{selectedAccount.registeredTime}}</span>
+					</div>
+					<div class="form-details-item form-details-item-sm">
+						<label>最近登录时间:</label> <span>{{selectedAccount.latelyLoginTime}}</span>
+					</div>
+				</div>
+			</div>
+			<table class="table channel-table">
+				<thead>
+					<tr>
+						<th>通道</th>
+						<th>返点</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="receiveOrderChannel in selectedAccount.receiveOrderChannels">
+						<td>{{receiveOrderChannel.channelName}}</td>
+						<td><input class="form-control-sm" v-model="receiveOrderChannel.rebate"></td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="container" style="margin-top: 1.3rem;">
+				<form>
+					<button type="button" class="btn btn-success btn-lg btn-block" v-on:click="adjustRebate">确认调整</button>
+					<button type="button" class="btn btn-light btn-lg btn-block" v-on:click="showAccountManagePage">返回</button>
+				</form>
+			</div>
+		</div>
+
+		<div class="page-body" style="background: #f2f2f2;" v-show="manualTopScoreFlag">
+			<div class="form-details">
+				<div class="form-details-body">
+					<div class="form-details-item form-details-item-sm">
+						<label>下级账号:</label> <span>{{selectedAccount.userName}}</span><label class="form-details-item-highlight">{{accountTypeFormat(selectedAccount)}}</label>
+					</div>
+					<div class="form-details-item form-details-item-sm">
+						<label>剩余账户余额:</label> <span class="form-details-item-highlight">{{selectedAccount.cashDeposit}}</span>
+					</div>
+				</div>
+			</div>
+			<div class="form-details">
+				<div class="form-details-body">
+					<div class="form-details-item form-details-item-sm">
+						<label>我的账户余额:</label> <span>{{cashDeposit}}</span>
+					</div>
+				</div>
+			</div>
+			<div style="padding-left: 2rem;">
+				<div class="row">
+					<div class="col-sm-9 offset-sm-3">
+						<label>转入金额:</label> <span><input type="number" v-model="topScoreAmount"></span>
+					</div>
+				</div>
+			</div>
+			<div class="container" style="margin-top: 1.3rem;">
+				<form>
+					<button type="button" class="btn btn-success btn-lg btn-block" v-on:click="manualTopScore">确认上分</button>
+					<button type="button" class="btn btn-light btn-lg btn-block" v-on:click="showAccountManagePage">返回</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div th:replace="common/footer::html"></div>
+	<link href="/css/common/theme-brown.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript">
+		var lowerLevelAccountManageVM = new Vue({
+			el : '#lowerLevelAccountManage',
+			data : {
+				global : GLOBAL,
+				queryScope : '20',
+				queryScopeDictItems : [ {
+					dictItemCode : '20',
+					dictItemName : '指定账号及直接下级'
+				}, {
+					dictItemCode : '10',
+					dictItemName : '所有账号'
+				} ],
+				userName : '',
+				accounts : [],
+				pageNum : 1,
+				totalPage : 1,
+				accountManageFlag : true,
+				adjustRebateFlag : false,
+				selectedAccount : {},
+				manualTopScoreFlag : false,
+				cashDeposit : '',
+				topScoreAmount : ''
+			},
+			computed : {},
+			created : function() {
+			},
+			mounted : function() {
+				headerVM.title = '下级账号管理';
+				headerVM.showBackFlag = true;
+				this.loadByPage();
+			},
+			methods : {
+
+				adjustRebate : function() {
+					var that = this;
+					var receiveOrderChannels = that.selectedAccount.receiveOrderChannels;
+					for (var i = 0; i < receiveOrderChannels.length; i++) {
+						var receiveOrderChannel = receiveOrderChannels[i];
+						if (receiveOrderChannel.rebate == null || receiveOrderChannel.rebate == '') {
+							layer.alert('请设置返点', {
+								title : '提示',
+								icon : 7,
+								time : 3000
+							});
+							return;
+						}
+					}
+					that.$http.post('/agent/adjustRebate', receiveOrderChannels).then(function(res) {
+						layer.alert('操作成功!', {
+							icon : 1,
+							time : 3000,
+							shade : false
+						});
+						that.showAccountManagePage();
+						that.query();
+					});
+				},
+
+				showManualTopScorePage : function(account) {
+					headerVM.title = '手动上分';
+					headerVM.showBackFlag = false;
+					this.accountManageFlag = false;
+					this.adjustRebateFlag = false;
+					this.manualTopScoreFlag = true;
+					this.selectedAccount = JSON.parse(JSON.stringify(account));
+					this.getUserAccountInfo();
+				},
+
+				manualTopScore : function() {
+					var that = this;
+					that.$http.post('/agent/manualTopScore', {
+						topScoreAccountId : that.selectedAccount.id,
+						topScoreAmount : that.topScoreAmount
+					}).then(function(res) {
+						layer.alert('操作成功!', {
+							icon : 1,
+							time : 3000,
+							shade : false
+						});
+						that.showAccountManagePage();
+						that.query();
+					});
+				},
+				showManualState : function(account) {
+					var that = this;
+					that.$http.post('/agent/showManualState', {
+						userAccountId : account.id,
+						state : account.state
+					}).then(function(res) {
+						layer.alert('操作成功!', {
+							icon : 1,
+							time : 3000,
+							shade : false
+						});
+						that.showAccountManagePage();
+						that.query();
+					});
+				},
+
+				getUserAccountInfo : function() {
+					var that = this;
+					that.$http.get('/userAccount/getUserAccountInfo').then(function(res) {
+						if (res.body.data != null) {
+							that.cashDeposit = res.body.data.cashDeposit;
+						}
+					});
+				},
+
+				showAdjustRebatePage : function(account) {
+					headerVM.title = '调整返点';
+					headerVM.showBackFlag = false;
+					this.accountManageFlag = false;
+					this.adjustRebateFlag = true;
+					this.selectedAccount = JSON.parse(JSON.stringify(account));
+				},
+
+				showAccountManagePage : function() {
+					headerVM.title = '下级账号管理';
+					headerVM.showBackFlag = true;
+					this.accountManageFlag = true;
+					this.adjustRebateFlag = false;
+				},
+
+				accountTypeFormat : function(account) {
+					return account.accountTypeName;
+				},
+				query : function() {
+					this.pageNum = 1;
+					this.loadByPage();
+				},
+				state : function(state) {
+					var name = "正常";
+					if(state == "0"){
+						name = "禁止";
+					}
+					return name;
+				},
+				stateName : function(state) {
+					var	name = "禁止账号";
+					if(state == "0"){
+					    name = "开启账号";
+					}
+					return name;
+				},
+
+				prePage : function() {
+					this.pageNum = this.pageNum - 1;
+					this.loadByPage();
+				},
+
+				nextPage : function() {
+					this.pageNum = this.pageNum + 1;
+					this.loadByPage();
+				},
+
+				loadByPage : function() {
+					var that = this;
+					that.$http.get('/agent/findLowerLevelAccountDetailsInfoByPage', {
+						params : {
+							pageSize : 5,
+							pageNum : that.pageNum,
+							queryScope : that.queryScope,
+							userName : that.userName
+						}
+					}).then(function(res) {
+						that.accounts = res.body.data.content;
+						that.pageNum = res.body.data.pageNum;
+						that.totalPage = res.body.data.totalPage;
+					});
+				}
+			}
+		});
+	</script>
+</body>
+</html>

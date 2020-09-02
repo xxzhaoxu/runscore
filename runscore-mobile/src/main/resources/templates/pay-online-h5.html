@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="renderer" content="webkit">
+<title>H5收银台-在线支付</title>
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<script src="https://cdn.staticfile.org/layer/2.3/layer.js"></script>
+<link href="/css/payonlineH5/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="/css/payonlineH5/style.css" rel="stylesheet" type="text/css">
+<link href="/css/payonlineH5/pay.css" rel="stylesheet" type="text/css">
+<script src="/js/common/common.js"></script>
+</head>
+<body style="background:#f1f2f7">
+<div id="pay-onlineH5">
+	<div class="culmn">
+    <section id="features" class="features">
+        <div class="container">
+            <div class="row">
+                <div class="main_features ">
+                    <div class="gray-box">
+                        <div class="title">
+                            <h2>H5收银台-{{sh}}</h2>
+                        </div>
+                        <!--内容-->
+                        <div>
+                            <div class="order-info">
+                                <div class="pay-info">
+                                    <div class="form">
+                                        <div class="form-group">
+                                            <label for="yourOrderId" class="control-label col-sm-3">订单号<span class="red-txt"> *</span></label>
+                                            <div class="col-sm-9">
+                                                <input class="form-control" disabled id="dd1" name="dd1"  type="text" >
+                                            </div>
+                                        </div>
+                                        <div class="form-group" id="custom-input" style="display: block">
+                                            <label class="control-label col-sm-3">支付金额<span class="red-txt"> *</span></label>
+                                            <div class="col-sm-9">
+                                                <input class="form-control" id="money" name="money" oninput="toMoney()" type="text" maxlength="20">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" id="custom-input" style="display: block">
+                                            <label class="control-label col-sm-3">备注</label>
+                                            <div class="col-sm-9">
+                                                <input class="form-control" id="attch" name="attch" v-model="attch" type="text" >
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="pay-type">
+                                    <div class="p-title">支付方式</div>
+                                    <div class="pay-item" >
+	                                        <div v-for="(dictItem,index) in gatheringChannelDictItems" v-bind:class="{'active': payType == dictItem.channelCode}" v-on:click="payType = dictItem.channelCode" >{{dictItem.channelName}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="box-inner">
+                                <div>
+                                    <span>应付金额：   </span>
+                                    <em><span>¥</span><em id="realMoney"></em></em>
+                                    <input type="text" class="main-btn" value="提交订单" v-on:click="submitPay" id="submit" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+</div>
+<input type="hidden" id="orderNo"/>
+	<script type="text/javascript">
+	   $(document).ready(function(){
+	       var r = window.setInterval(function() {
+				var on = Math.round(new Date()) + "" + diu_Randomize(1000,10000);
+	            $("#dd1").val(on);
+	            $("#orderNo").val(on);
+	       },
+	       60000);
+	   });
+	   function diu_Randomize(b,e){
+		    return Math.floor( ( Math.random() * e ) + b );
+		}
+	   function toMoney() {
+	        money = $("#money").val();
+	        if (money == "") {
+	            $("#realMoney").html("0.00");
+	            return;
+	        }
+	        money = parseFloat(money);
+	        money = money.toFixed(2);
+	        money = money.toLocaleString();
+	        $("#realMoney").html(money);
+	        return money;
+	    }
+	</script>
+
+	<script type="text/javascript">
+		layer.load();
+		Vue.http.interceptors.push(function(request) {
+			return function(response) {
+				if (response.body.code != 200) {
+					response.ok = false;
+					layer.alert(response.body.msg, {
+						title : '提示',
+						icon : 7,
+						time : 3000
+					});
+					layer.closeAll('loading');
+				}
+			};
+		});
+
+		var payVM = new Vue({
+			el : '#pay-onlineH5',
+			data : {
+				global : GLOBAL,
+				websiteTitle : GLOBAL.systemSetting.websiteTitle,
+				sh : '默认商户',
+				attch : '',
+				amount : '100',
+				payType : 'wechat',
+				merchantNum : 'tencent',
+				secretKey : '',
+				orderNo : '',
+				notifyUrl : '',
+				returnUrl : '',
+				merchant : [],
+				gatheringChannelDictItems : [],
+			},
+			computed : {},
+			created : function() {
+				this.loadGatheringChannelDictItem();
+				var merchantNum = getQueryString('merchantNum');
+				if(merchantNum != null && merchantNum != ""){
+					this.loadMerchant(merchantNum);
+				}
+			},
+			mounted(){
+		   },
+			methods : {
+				/**
+				 * 加载收款通道字典项
+				 */
+				loadGatheringChannelDictItem : function() {
+					var that = this;
+					that.$http.get('/gatheringChannel/findAllGatheringChannel').then(function(res) {
+						that.gatheringChannelDictItems = res.body.data;
+						var on = Math.round(new Date()) + "" + diu_Randomize(1000,10000);
+			            $("#dd1").val(on);
+			            $("#orderNo").val(on);
+			            var merchantNum = getQueryString('merchantNum');
+						if(merchantNum == null || merchantNum == ""){
+							layer.closeAll('loading');
+						}
+					});
+				},
+				loadMerchant : function(merchantNum) {
+					var that = this;
+					that.$http.get('/api/getMerchantByMerchantNum?merchantNum='+merchantNum).then(function(res) {
+						that.merchant = res.body.data;
+						if(that.merchant != null){
+							that.sh = res.body.data.merchantName;
+							that.merchantNum = res.body.data.merchantNum;
+							that.secretKey = res.body.data.secretKey;
+							if(res.body.data.notifyUrl != null && res.body.data.notifyUrl != ""){
+								that.notifyUrl = res.body.data.notifyUrl;
+							}
+							if(res.body.data.returnUrl != null && res.body.data.returnUrl != ""){
+								that.returnUrl = res.body.data.returnUrl;
+							}
+						}
+						layer.closeAll('loading');
+					});
+				},
+				loadQueryMoney : function(amount) {
+					var that = this;
+					this.amount = amount;
+					if(amount == 'money'){
+						$('.tr_rechoth').show();
+					}else{
+						$('.tr_rechoth').hide();
+					}
+				},
+				submitPay : function() {
+					var that = this;
+					that.orderNo = $("#orderNo").val();
+					if (that.amount == null || that.queryMoney == '') {
+						layer.alert('请选择金额');
+						return;
+					}
+
+					if($("#money").val() == '' || $("#money").val() == null){
+						layer.alert('请输入金额');
+						return;
+					}
+
+					layer.load();
+					 that.$http.post('/api/payOnline', {
+						amount : $("#money").val(),
+						payType : that.payType,
+						merchantNum : that.merchantNum,
+						attch : that.attch,
+						orderNo : $("#orderNo").val(),
+						returnUrl : that.returnUrl,
+						notifyUrl : that.notifyUrl,
+						secretKey : that.secretKey
+					}, {
+						emulateJSON : true
+					}).then(function(res) {
+						layer.closeAll('loading');
+						console.log(res)
+						if(res.body.code == 200){
+						   layer.alert('提交成功，正在跳转支付地址....');
+						   window.location.href = res.body.data.payUrl;
+						  // var t=setTimeout(window.open(res.body.data.payUrl,"_blank"),3000);
+						}else{
+							layer.alert('提交失败');
+						}
+					});
+				}
+			}
+		});
+	</script>
+
+</body>
+</html>

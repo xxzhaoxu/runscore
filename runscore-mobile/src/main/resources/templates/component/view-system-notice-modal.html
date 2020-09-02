@@ -1,0 +1,105 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<style>
+.view-system-notice-dialog {
+	max-width: 100%;
+	width: 96%;
+}
+
+.view-system-notice-dialog .modal-body {
+	height: 25rem;
+	overflow: auto;
+}
+
+.view-notice {
+	margin-bottom: 0.8rem;
+}
+
+.notice-title {
+	text-align: center;
+	font-size: 18px;
+	font-weight: bold;
+	overflow: hidden;
+}
+
+.notice-publish-time {
+	text-align: center;
+}
+
+.notice-content {
+	height: 14rem;
+	overflow: auto;
+}
+</style>
+</head>
+
+<body>
+	<div id="view-system-notice-modal" v-cloak>
+		<div v-show="showViewNoticeFlag">
+			<div class="modal-mask">
+				<div class="modal-wrapper">
+					<div class="modal-dialog view-system-notice-dialog">
+						<div class="modal-content">
+							<div class="modal-body">
+								<div style="height: 2rem;">
+									<label><i class="fa fa-volume-up" aria-hidden="true"></i></label>
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="showViewNoticeFlag = false">
+										<span aria-hidden="true">&times;</span>
+									</button>
+								</div>
+								<div class="view-notice">
+									<div class="notice-title">{{systemNotice.title}}</div>
+									<div class="notice-publish-time">{{systemNotice.publishTime}}</div>
+									<div class="notice-content" v-html="systemNotice.content"></div>
+								</div>
+								<button type="button" class="btn btn-lg btn-danger btn-block" v-on:click="markRead(systemNotice.id)">我知道了</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		var viewSystemNoticeModal = new Vue({
+			el : '#view-system-notice-modal',
+			data : {
+				showViewNoticeFlag : false,
+				systemNotice : {}
+			},
+			computed : {},
+			created : function() {
+			},
+			methods : {
+
+				viewNoticeContent : function(systemNotice) {
+					this.systemNotice = systemNotice;
+					this.showViewNoticeFlag = true;
+				},
+
+				getLatestNotice : function() {
+					var that = this;
+					that.$http.get('/systemNotice/getLatestNotice').then(function(res) {
+						var systemNotice = res.body.data;
+						if (systemNotice != null) {
+							that.systemNotice = systemNotice;
+							that.showViewNoticeFlag = true;
+						}
+					});
+				},
+
+				markRead : function(id) {
+					var that = this;
+					that.$http.get('/systemNotice/markRead', {
+						params : {
+							id : id
+						}
+					}).then(function(res) {
+						that.showViewNoticeFlag = false;
+					});
+				}
+			}
+		});
+	</script>
+</body>
+</html>

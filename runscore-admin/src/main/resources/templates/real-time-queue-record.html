@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<title>实时派单记录(派单)</title>
+<link href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<script src="https://cdn.staticfile.org/echarts/4.2.1-rc1/echarts.min.js"></script>
+<script src="https://cdn.staticfile.org/dayjs/1.7.8/dayjs.min.js"></script>
+<link href="/css/common/common.css" rel="stylesheet" type="text/css">
+<script src="/js/common/common.js"></script>
+<style type="text/css">
+.queue-record-area .col-sm-3 {
+	padding-bottom: 1rem;
+}
+
+.queue-record-area .card-text {
+	margin-bottom: 0.2rem;
+}
+</style>
+</head>
+<body>
+	<div th:replace="common/header::html"></div>
+	<div id="real-time-queue-record" style="padding-top: 1rem;" v-cloak>
+	<div v-show="realTimeQueueFlag" style="color: red;font-size: larger;text-align: center;" >暂无排队记录！</div>
+		<div class="row queue-record-area" style="margin-right: 0; margin-left: 0;">
+			<div class="col-sm-3" v-for="(queueRecord, index) in realTimeQueueRecords">
+				<div class="card">
+					<div class="card-body">
+						<h4 class="card-title">
+							<span>第{{index + 1}}位</span><span style="float: right; cursor: pointer; color: red; font-size: 16px; font-weight: bold;" v-on:click="updateReceiveOrderStateToStop(queueRecord.userAccountId)">退出队列</span>
+						</h4>
+						<p class="card-text" style="font-weight: bold; color: #0062cc;">{{queueRecord.userName}},可用余额:{{queueRecord.cashDeposit}}</p>
+						<p class="card-text">{{queueRecord.queueTime}}(排队时间)</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="/js/real-time-queue-record.js"></script>
+</body>
+</html>

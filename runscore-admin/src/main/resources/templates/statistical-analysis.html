@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<title>统计分析</title>
+<link href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<script src="https://cdn.staticfile.org/echarts/4.2.1-rc1/echarts.min.js"></script>
+<script src="https://cdn.staticfile.org/dayjs/1.7.8/dayjs.min.js"></script>
+<link href="/css/common/common.css" rel="stylesheet" type="text/css">
+<script src="/js/common/common.js"></script>
+<style type="text/css">
+.analysis-row1 {
+	margin-left: 20px;
+	margin-right: 20px;
+	padding-top: 20px;
+}
+
+.analysis-card {
+	color: #fff;
+	border-radius: 6px;
+	background: #2c3448;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	margin-right: 26px;
+}
+
+.analysis-card-gathering {
+	flex: 0 0 23%;
+	max-width: 23%;
+	margin-right: 34px;
+}
+
+.analysis-card-summary {
+	box-shadow: 0px 8px 6px #888888;
+}
+
+.analysis-card-gathering:last-child {
+	margin-right: 0px;
+}
+
+.analysis-card-row1 {
+
+}
+
+.analysis-card-row2 {
+	padding-left: 33px;
+    font-size: 24px;
+	padding-bottom: 10px;
+	color: #26dad0;
+	font-weight: bold;
+}
+
+.analysis-card-row3 {
+	display: flex;
+	justify-content: space-between;
+}
+
+.index-label {
+	color: #999;
+}
+
+.index-value {
+	font-weight: bold;
+}
+
+.index-value-amount {
+	color: #26dad0;
+}
+
+.analysis-row2 {
+	margin-left: 20px;
+	margin-right: 20px;
+	padding-top: 20px;
+}
+
+.merchant-trade-situation-table {
+	border-bottom: 0 !important;
+}
+
+.merchant-trade-situation-table thead th {
+	border-bottom: 0;
+	text-align: center;
+	font-size: 14px;
+	font-weight: bold;
+	background: #2c3448;
+	color: #fff;
+	border-radius: 6px;
+}
+
+.merchant-trade-situation-table tr td {
+	text-align: center;
+	border-left: 0;
+	background: #2c3448;
+	color: #26dad0;
+	border-radius: 6px;
+}
+
+.trade-order-num {
+	cursor: pointer;
+}
+
+.merchant-trade-situation-title {
+	text-align: unset !important;
+}
+
+.merchant-trade-situation-title .badge {
+	cursor: pointer;
+}
+
+.merchant-trade-situation-switch-area {
+	padding-right: 22rem;
+}
+
+.merchant-trade-situation-title label {
+	margin-bottom: 0;
+}
+</style>
+</head>
+<body>
+	<div th:replace="common/header::html"></div>
+	<div id="statistical-analysis" v-cloak>
+		<div class="row analysis-row1">
+			<div class="col-sm-12 analysis-card">
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">累计账户余额</div>
+						<div class="index-value index-value-amount">{{cashDepositBounty.totalCashDeposit}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+					<div>
+						<div class="index-label">累计奖励金</div>
+						<div class="index-value index-value-amount">{{cashDepositBounty.totalBounty}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+					<div>
+						<div class="index-label">本月奖励金</div>
+						<div class="index-value index-value-amount">{{cashDepositBounty.monthBounty}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+					<div>
+						<div class="index-label">昨日奖励金</div>
+						<div class="index-value index-value-amount">{{cashDepositBounty.yesterdayBounty}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+					<div>
+						<div class="index-label">今日奖励金</div>
+						<div class="index-value index-value-amount">{{cashDepositBounty.todayBounty}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row analysis-row1">
+			<div class="col-sm-3 analysis-card analysis-card-summary analysis-card-gathering">
+				<div class="analysis-card-row1">累计收款金额</div>
+				<div class="analysis-card-row2">{{tradeSituation.totalTradeAmount}}{{global.systemSetting.currencyUnit}}</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">已支付订单量</div>
+						<div class="index-value">{{tradeSituation.totalPaidOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">订单量</div>
+						<div class="index-value">{{tradeSituation.totalOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">成功率</div>
+						<div class="index-value">{{tradeSituation.totalSuccessRate}}%</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-3 analysis-card analysis-card-summary analysis-card-gathering">
+				<div class="analysis-card-row1">本月收款金额</div>
+				<div class="analysis-card-row2">{{tradeSituation.monthTradeAmount}}{{global.systemSetting.currencyUnit}}</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">已支付订单量</div>
+						<div class="index-value">{{tradeSituation.monthPaidOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">订单量</div>
+						<div class="index-value">{{tradeSituation.monthOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">成功率</div>
+						<div class="index-value">{{tradeSituation.monthSuccessRate}}%</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-3 analysis-card analysis-card-summary analysis-card-gathering">
+				<div class="analysis-card-row1">昨日收款金额</div>
+				<div class="analysis-card-row2">{{tradeSituation.yesterdayTradeAmount}}{{global.systemSetting.currencyUnit}}</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">已支付订单量</div>
+						<div class="index-value">{{tradeSituation.yesterdayPaidOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">订单量</div>
+						<div class="index-value">{{tradeSituation.yesterdayOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">成功率</div>
+						<div class="index-value">{{tradeSituation.yesterdaySuccessRate}}%</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-3 analysis-card analysis-card-summary analysis-card-gathering">
+				<div class="analysis-card-row1">今日收款金额</div>
+				<div class="analysis-card-row2">{{tradeSituation.todayTradeAmount}}{{global.systemSetting.currencyUnit}}</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">已支付订单量</div>
+						<div class="index-value">{{tradeSituation.todayPaidOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">订单量</div>
+						<div class="index-value">{{tradeSituation.todayOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">成功率</div>
+						<div class="index-value">{{tradeSituation.todaySuccessRate}}%</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row analysis-row1">
+			<div class="col-sm-3 analysis-card analysis-card-summary analysis-card-gathering">
+				<div class="analysis-card-row1">累计充值</div>
+				<div class="analysis-card-row2">{{rechargeSituation.totalTradeAmount}}{{global.systemSetting.currencyUnit}}</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">成功笔数</div>
+						<div class="index-value">{{rechargeSituation.totalSuccessOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">笔数</div>
+						<div class="index-value">{{rechargeSituation.totalOrderNum}}笔</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-3 analysis-card analysis-card-summary analysis-card-gathering">
+				<div class="analysis-card-row1">本月充值</div>
+				<div class="analysis-card-row2">{{rechargeSituation.monthTradeAmount}}{{global.systemSetting.currencyUnit}}</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">成功笔数</div>
+						<div class="index-value">{{rechargeSituation.monthSuccessOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">笔数</div>
+						<div class="index-value">{{rechargeSituation.monthOrderNum}}笔</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-3 analysis-card analysis-card-summary analysis-card-gathering">
+				<div class="analysis-card-row1">昨日充值</div>
+				<div class="analysis-card-row2">{{rechargeSituation.yesterdayTradeAmount}}{{global.systemSetting.currencyUnit}}</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">成功笔数</div>
+						<div class="index-value">{{rechargeSituation.yesterdaySuccessOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">笔数</div>
+						<div class="index-value">{{rechargeSituation.yesterdayOrderNum}}笔</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-3 analysis-card analysis-card-summary analysis-card-gathering">
+				<div class="analysis-card-row1">今日充值</div>
+				<div class="analysis-card-row2">{{rechargeSituation.todayTradeAmount}}{{global.systemSetting.currencyUnit}}</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">成功笔数</div>
+						<div class="index-value">{{rechargeSituation.todaySuccessOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">笔数</div>
+						<div class="index-value">{{rechargeSituation.todayOrderNum}}笔</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="row analysis-row1">
+			<div class="col-sm-3 analysis-card analysis-card-summary analysis-card-gathering">
+				<div class="analysis-card-row1">累计提现</div>
+				<div class="analysis-card-row2">{{withdrawSituation.totalTradeAmount}}{{global.systemSetting.currencyUnit}}</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">成功笔数</div>
+						<div class="index-value">{{withdrawSituation.totalSuccessOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">笔数</div>
+						<div class="index-value">{{withdrawSituation.totalOrderNum}}笔</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-3 analysis-card analysis-card-summary analysis-card-gathering">
+				<div class="analysis-card-row1">本月提现</div>
+				<div class="analysis-card-row2">{{withdrawSituation.monthTradeAmount}}{{global.systemSetting.currencyUnit}}</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">成功笔数</div>
+						<div class="index-value">{{withdrawSituation.monthSuccessOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">笔数</div>
+						<div class="index-value">{{withdrawSituation.monthOrderNum}}笔</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-3 analysis-card analysis-card-summary analysis-card-gathering">
+				<div class="analysis-card-row1">昨日提现</div>
+				<div class="analysis-card-row2">{{withdrawSituation.yesterdayTradeAmount}}{{global.systemSetting.currencyUnit}}</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">成功笔数</div>
+						<div class="index-value">{{withdrawSituation.yesterdaySuccessOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">笔数</div>
+						<div class="index-value">{{withdrawSituation.yesterdayOrderNum}}笔</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-3 analysis-card analysis-card-summary analysis-card-gathering">
+				<div class="analysis-card-row1">今日提现</div>
+				<div class="analysis-card-row2">{{withdrawSituation.todayTradeAmount}}{{global.systemSetting.currencyUnit}}</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">成功笔数</div>
+						<div class="index-value">{{withdrawSituation.todaySuccessOrderNum}}笔</div>
+					</div>
+					<div>
+						<div class="index-label">笔数</div>
+						<div class="index-value">{{withdrawSituation.todayOrderNum}}笔</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
+		<div class="row analysis-row1">
+			<div class="col-sm-3 analysis-card analysis-card-summary analysis-card-gathering">
+				<div class="analysis-card-row1">累计调整账户余额</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">手动增</div>
+						<div class="index-value">{{adjustCashDepositSituation.totalAddAmount}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+					<div>
+						<div class="index-label">手动减</div>
+						<div class="index-value">{{adjustCashDepositSituation.totalMinusAmount}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3 analysis-card analysis-card-summary analysis-card-gathering">
+				<div class="analysis-card-row1">本月调整账户余额</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">手动增</div>
+						<div class="index-value">{{adjustCashDepositSituation.monthAddAmount}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+					<div>
+						<div class="index-label">手动减</div>
+						<div class="index-value">{{adjustCashDepositSituation.monthMinusAmount}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3 analysis-card analysis-card-summary analysis-card-gathering">
+				<div class="analysis-card-row1">昨日调整账户余额</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">手动增</div>
+						<div class="index-value">{{adjustCashDepositSituation.yesterdayAddAmount}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+					<div>
+						<div class="index-label">手动减</div>
+						<div class="index-value">{{adjustCashDepositSituation.yesterdayMinusAmount}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3 analysis-card analysis-card-summary analysis-card-gathering">
+				<div class="analysis-card-row1">今日调整账户余额</div>
+				<div class="analysis-card-row3">
+					<div>
+						<div class="index-label">手动增</div>
+						<div class="index-value">{{adjustCashDepositSituation.todayAddAmount}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+					<div>
+						<div class="index-label">手动减</div>
+						<div class="index-value">{{adjustCashDepositSituation.todayMinusAmount}}{{global.systemSetting.currencyUnit}}</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row analysis-row2">
+			<div class="col-sm-12">
+				<table class="table table-hover table-bordered merchant-trade-situation-table">
+					<thead>
+						<tr>
+							<th class="merchant-trade-situation-title" colspan="6"><label class="merchant-trade-situation-switch-area"> <span class="badge" v-bind:class="queryScope == 'total' ? 'badge-primary' : 'badge-secondary'" v-on:click="queryScope = 'total'">累计交易</span> <span class="badge" v-bind:class="queryScope == 'month' ? 'badge-primary' : 'badge-secondary'" v-on:click="queryScope = 'month'">本月交易</span> <span class="badge" v-bind:class="queryScope == 'yesterday' ? 'badge-primary' : 'badge-secondary'" v-on:click="queryScope = 'yesterday'">昨日交易</span> <span class="badge" v-bind:class="queryScope == 'today' ? 'badge-primary' : 'badge-secondary'" v-on:click="queryScope = 'today'">今日交易</span>
+							</label> <label>各商户交易情况</label></th>
+						</tr>
+						<tr>
+							<th>商户</th>
+							<th>交易金额</th>
+							<th>手续费</th>
+							<th>已支付订单量</th>
+							<th>订单量</th>
+							<th>成功率</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="situation in merchantTradeSituations">
+							<td>{{situation.merchantName}}</td>
+							<td v-show="queryScope == 'total'">{{situation.totalTradeAmount}}{{global.systemSetting.currencyUnit}}</td>
+							<td v-show="queryScope == 'total'">{{situation.totalPoundage}}{{global.systemSetting.currencyUnit}}</td>
+							<td class="trade-order-num" v-show="queryScope == 'total'" v-on:click="toMerchantOrderPage(situation.merchantName, '4', 'all')">{{situation.totalPaidOrderNum}}笔</td>
+							<td class="trade-order-num" v-show="queryScope == 'total'" v-on:click="toMerchantOrderPage(situation.merchantName, '', 'all')">{{situation.totalOrderNum}}笔</td>
+							<td v-show="queryScope == 'total'">{{situation.totalSuccessRate}}%</td>
+
+							<td v-show="queryScope == 'month'">{{situation.monthTradeAmount}}{{global.systemSetting.currencyUnit}}</td>
+							<td v-show="queryScope == 'month'">{{situation.monthPoundage}}{{global.systemSetting.currencyUnit}}</td>
+							<td class="trade-order-num" v-show="queryScope == 'month'" v-on:click="toMerchantOrderPage(situation.merchantName, '4', 'month')">{{situation.monthPaidOrderNum}}笔</td>
+							<td class="trade-order-num" v-show="queryScope == 'month'" v-on:click="toMerchantOrderPage(situation.merchantName, '', 'month')">{{situation.monthOrderNum}}笔</td>
+							<td v-show="queryScope == 'month'">{{situation.monthSuccessRate}}%</td>
+
+							<td v-show="queryScope == 'yesterday'">{{situation.yesterdayTradeAmount}}{{global.systemSetting.currencyUnit}}</td>
+							<td v-show="queryScope == 'yesterday'">{{situation.yesterdayPoundage}}{{global.systemSetting.currencyUnit}}</td>
+							<td class="trade-order-num" v-show="queryScope == 'yesterday'" v-on:click="toMerchantOrderPage(situation.merchantName, '4', 'yesterday')">{{situation.yesterdayPaidOrderNum}}笔</td>
+							<td class="trade-order-num" v-show="queryScope == 'yesterday'" v-on:click="toMerchantOrderPage(situation.merchantName, '', 'yesterday')">{{situation.yesterdayOrderNum}}笔</td>
+							<td v-show="queryScope == 'yesterday'">{{situation.yesterdaySuccessRate}}%</td>
+
+							<td v-show="queryScope == 'today'">{{situation.todayTradeAmount}}{{global.systemSetting.currencyUnit}}</td>
+							<td v-show="queryScope == 'today'">{{situation.todayPoundage}}{{global.systemSetting.currencyUnit}}</td>
+							<td class="trade-order-num" v-show="queryScope == 'today'" v-on:click="toMerchantOrderPage(situation.merchantName, '4', 'today')">{{situation.todayPaidOrderNum}}笔</td>
+							<td class="trade-order-num" v-show="queryScope == 'today'" v-on:click="toMerchantOrderPage(situation.merchantName, '', 'today')">{{situation.todayOrderNum}}笔</td>
+							<td v-show="queryScope == 'today'">{{situation.todaySuccessRate}}%</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="row analysis-row2">
+			<div class="col-sm-12">
+				<table class="table table-hover table-bordered merchant-trade-situation-table">
+					<thead>
+						<tr>
+							<th class="merchant-trade-situation-title" colspan="7"><label class="merchant-trade-situation-switch-area"> <span class="badge" v-on:click="setChannelQueryCond('all')">累计交易</span>
+									<span class="badge" v-on:click="setChannelQueryCond('month')">本月交易</span> <span class="badge" v-on:click="setChannelQueryCond('yesterday')">昨日交易</span> <span class="badge"
+									v-on:click="setChannelQueryCond('today')">今日交易</span> <input type="date" class="form-control-sm query-date" v-model="channelStartTime"><span>到</span><input type="date"
+									class="form-control-sm query-date" v-model="channelEndTime">
+									<button type="button" class="btn btn-secondary btn-sm" v-on:click="loadChannelTradeSituation">查询</button>
+							</label> <label>各通道交易情况</label></th>
+						</tr>
+						<tr>
+							<th>通道</th>
+							<th>交易金额</th>
+							<th>手续费</th>
+							<th>商户实收</th>
+							<th>已支付订单量</th>
+							<th>订单量</th>
+							<th>成功率</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="situation in channelTradeSituations">
+							<td>{{situation.channelName}}</td>
+							<td>{{situation.tradeAmount}}{{global.systemSetting.currencyUnit}}</td>
+							<td>{{situation.poundage}}{{global.systemSetting.currencyUnit}}</td>
+							<td>{{situation.actualIncome}}{{global.systemSetting.currencyUnit}}</td>
+							<td class="trade-order-num" v-on:click="toMerchantOrderPageWithChannel(situation.channelId, '4')">{{situation.paidOrderNum}}笔</td>
+							<td class="trade-order-num" v-on:click="toMerchantOrderPageWithChannel(situation.channelId, '')">{{situation.orderNum}}笔</td>
+							<td>{{situation.successRate}}%</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<!-- <div class="row analysis-row2">
+			<div class="col-sm-12">
+				<table class="table table-hover table-bordered merchant-trade-situation-table">
+					<thead>
+						<tr>
+							<th class="merchant-trade-situation-title" colspan="6"><label class="merchant-trade-situation-switch-area"> <span class="badge" v-bind:class="queryRScope == 'total' ? 'badge-primary' : 'badge-secondary'" v-on:click="queryRScope = 'total'">累计业绩</span> <span class="badge" v-bind:class="queryRScope == 'month' ? 'badge-primary' : 'badge-secondary'" v-on:click="queryRScope = 'month'">本月业绩</span> <span class="badge" v-bind:class="queryRScope == 'yesterday' ? 'badge-primary' : 'badge-secondary'" v-on:click="queryRScope = 'yesterday'">昨日业绩</span> <span class="badge" v-bind:class="queryRScope == 'today' ? 'badge-primary' : 'badge-secondary'" v-on:click="queryRScope = 'today'">今日业绩</span>
+							</label> <label>各总代理业绩</label></th>
+						</tr>
+						<tr>
+							<th>总代理名称</th>
+
+							<th v-show="queryRScope == 'total'">累计收款</th>
+							<th v-show="queryRScope == 'total'">累计订单</th>
+							<th v-show="queryRScope == 'total'">累计成交</th>
+
+							<th v-show="queryRScope == 'month'">本月收款</th>
+							<th v-show="queryRScope == 'month'">本月订单</th>
+							<th v-show="queryRScope == 'month'">本月成交</th>
+
+							<th v-show="queryRScope == 'yesterday'">昨日收款</th>
+							<th v-show="queryRScope == 'yesterday'">昨日订单</th>
+							<th v-show="queryRScope == 'yesterday'">昨日成交</th>
+
+							<th v-show="queryRScope == 'today'">今日收款</th>
+							<th v-show="queryRScope == 'today'">今日订单</th>
+							<th v-show="queryRScope == 'today'">今日成交</th>
+
+							<th>成功率</th>
+						</tr>
+					</thead>
+					<tbody>
+						 <tr v-for="situation in merchantTradeResultsSituations">
+							<td>{{situation.userName}}</td>
+							<td v-show="queryRScope == 'total'">{{situation.totalTradeAmount}}{{global.systemSetting.currencyUnit}}</td>
+							<td v-show="queryRScope == 'total'" >{{situation.totalOrderNum}}笔</td>
+							<td v-show="queryRScope == 'total'" >{{situation.totalPaidOrderNum}}笔</td>
+							<td v-show="queryRScope == 'total'">{{situation.totalSuccessRate}}%</td>
+
+							<td v-show="queryRScope == 'month'">{{situation.monthTradeAmount}}{{global.systemSetting.currencyUnit}}</td>
+							<td v-show="queryRScope == 'month'" >{{situation.monthOrderNum}}笔</td>
+							<td v-show="queryRScope == 'month'" >{{situation.monthPaidOrderNum}}笔</td>
+							<td v-show="queryRScope == 'month'">{{situation.monthSuccessRate}}%</td>
+
+							<td v-show="queryRScope == 'yesterday'">{{situation.yesterdayTradeAmount}}{{global.systemSetting.currencyUnit}}</td>
+							<td v-show="queryRScope == 'yesterday'" >{{situation.yesterdayOrderNum}}笔</td>
+							<td v-show="queryRScope == 'yesterday'" >{{situation.yesterdayPaidOrderNum}}笔</td>
+							<td v-show="queryRScope == 'yesterday'">{{situation.yesterdaySuccessRate}}%</td>
+
+							<td v-show="queryRScope == 'today'">{{situation.todayTradeAmount}}{{global.systemSetting.currencyUnit}}</td>
+							<td v-show="queryRScope == 'today'" >{{situation.todayOrderNum}}笔</td>
+							<td v-show="queryRScope == 'today'" >{{situation.todayPaidOrderNum}}笔</td>
+							<td v-show="queryRScope == 'today'">{{situation.todaySuccessRate}}%</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div> -->
+		 <!-- <div class="row analysis-row2">
+			<div class="col-sm-6" id="total-bounty-rank-chart" style="height: 300px;"></div>
+			<div class="col-sm-6" id="today-bounty-rank-chart" style="height: 300px;"></div>
+		</div> -->
+	</div>
+	<script src="/js/statistical-analysis.js"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>系统公告</title>
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<script src="https://cdn.staticfile.org/layer/2.3/layer.js"></script>
+<link href="/css/common/common.css" rel="stylesheet" type="text/css">
+<script src="/js/common/common.js"></script>
+<style type="text/css">
+.system-notice-card {
+	margin-bottom: 0.5rem;
+}
+
+.system-notice-card .card-header {
+	background: rgba(10, 8, 8, 0.3);
+	color: #f8f9fa;
+}
+</style>
+</head>
+
+<body>
+	<div th:replace="common/header::html"></div>
+	<div id="systemNotice" v-cloak>
+		<div class="page-body" style="background: #f2f2f2;">
+			<div class="card system-notice-card" v-for="systemNotice in systemNotices">
+				<div class="card-header">{{systemNotice.publishTime}}</div>
+				<div class="card-body" v-on:click="viewSystemNoticeModal.viewNoticeContent(systemNotice)">{{systemNotice.title}}</div>
+			</div>
+		</div>
+	</div>
+	<div th:replace="component/view-system-notice-modal::html"></div>
+	<div th:replace="common/footer::html"></div>
+	<link href="/css/common/theme-brown.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript" src="/js/system-notice.js"></script>
+</body>
+</html>

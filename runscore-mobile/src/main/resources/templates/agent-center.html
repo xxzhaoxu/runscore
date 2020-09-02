@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>代理中心</title>
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<link href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<script src="https://cdn.staticfile.org/layer/2.3/layer.js"></script>
+<script src="/js/common/common.js"></script>
+<link href="/css/common/common.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+.home-page-nav {
+	height: 6rem !important;
+	background-color: #fff !important;
+}
+
+.home-page-nav a {
+	min-width: 4rem;
+}
+
+.list-group span {
+	float: right;
+}
+
+.list-group i {
+	font-size: 1.3rem;
+}
+
+.invite-code-quota {
+	height: 3rem;
+	line-height: 3rem;
+	font-size: 1.2rem;
+	padding-left: 1em;
+	padding-right: 1em;
+}
+
+.invite-code-quota label {
+	padding-right: 0.5rem;
+}
+
+.invite-code-quota span {
+	color: #c3606a;
+	display: inline-block;
+	min-width: 10rem;
+	font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+	<div th:replace="common/header::html"></div>
+	<div id="agentCenter" v-cloak>
+		<div class="page-body">
+			<div class="invite-code-quota">
+				<label>邀请码配额:</label><span>{{inviteCodeQuota}}个</span>
+			</div>
+			<div>
+				<nav class="navbar bg-light footer-navbar home-page-nav">
+					<a class="navbar-brand footer-navbar-brand" v-on:click="footerVM.goTo('/lower-level-account-manage')"><i class="fa fa-user-o" aria-hidden="true"></i> <span>下级账号管理</span> </a>
+					<!-- <a class="navbar-brand footer-navbar-brand" v-on:click="footerVM.goTo('/agent-open-an-account')"><i class="fa fa-product-hunt" aria-hidden="true"></i> <span>代理开户</span> </a>  -->
+					<a class="navbar-brand footer-navbar-brand" v-on:click="footerVM.goTo('/lower-level-open-an-account')"><i class="fa fa-level-down" aria-hidden="true"></i> <span>下级开户</span> </a>
+				</nav>
+			</div>
+			<ul class="list-group">
+				<li class="list-group-item" v-on:click="footerVM.goTo('/invite-code')">我的邀请码<span><i aria-hidden="true" class="fa fa-angle-right"></i></span>
+				</li>
+				<li class="list-group-item" v-on:click="footerVM.goTo('/lower-level-account-receive-order-record')">团队接单明细<span><i aria-hidden="true" class="fa fa-angle-right"></i></span>
+				</li>
+				<li class="list-group-item" v-on:click="footerVM.goTo('/lower-level-account-receive-results-record')">团队业绩明细<span><i aria-hidden="true" class="fa fa-angle-right"></i></span>
+				</li>
+				<!-- <li class="list-group-item" v-on:click="footerVM.goTo('/lower-level-account-change')">团队接单情况<span><i aria-hidden="true" class="fa fa-angle-right"></i></span>
+				</li> -->
+				<li class="list-group-item" v-on:click="footerVM.goTo('/lower-level-recharge-details')">团队充值明细<span><i aria-hidden="true" class="fa fa-angle-right"></i></span>
+				</li>
+				<li class="list-group-item" v-on:click="footerVM.goTo('/lower-level-withdraw-details')">团队提现明细<span><i aria-hidden="true" class="fa fa-angle-right"></i></span>
+				</li>
+				<li class="list-group-item" v-on:click="footerVM.goTo('/lower-level-account-change')">团队帐变报表<span><i aria-hidden="true" class="fa fa-angle-right"></i></span>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div th:replace="common/footer::html"></div>
+	<link href="/css/common/theme-brown.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript">
+		var agentCenterVM = new Vue({
+			el : '#agentCenter',
+			data : {
+				global : GLOBAL,
+				inviteCodeQuota : '',
+			},
+			computed : {},
+			created : function() {
+			},
+			mounted : function() {
+				headerVM.title = '代理中心';
+				headerVM.showBackFlag = true;
+				this.getInviteCodeQuota();
+			},
+			methods : {
+
+				getInviteCodeQuota : function() {
+					var that = this;
+					that.$http.get('/userAccount/getUserAccountInfo').then(function(res) {
+						that.inviteCodeQuota = res.body.data.inviteCodeQuota;
+					});
+				},
+
+				goTo : function(url) {
+					window.location.href = url;
+				},
+
+				logout : function() {
+					this.$http.post('/logout').then(function(res) {
+						window.location.href = '/my-home-page';
+					});
+				}
+			}
+		});
+	</script>
+</body>
+</html>

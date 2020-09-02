@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>我的主页</title>
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<link href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<script src="/js/common/common.js"></script>
+<link href="/css/base.css" type="text/css" rel="stylesheet"/>
+<link href="/css/style.css" type="text/css" rel="stylesheet"/>
+<style type="text/css">
+.header-navbar {
+	color: white;
+	display: block;
+	text-align: center;
+	height: 2.5rem;
+	line-height: 1rem;
+	background-color: #dc3545;
+}
+</style>
+</head>
+
+<body style="background: #F6F7F9">
+	<div th:replace="common/header::html"></div>
+	<div id="myHomePage" v-cloak>
+		<div class="wrp-auto" style="min-height: 13rem;">
+		<div class="center-bg" v-show="!isLoggedInFlag">
+			<div class="login-btn"  style="width:80%; margin:.3rem 20%;" v-show="!isLoggedInFlag">
+				<a href="#"  v-on:click="footerVM.goTo('/login')" >{{loginOrRegisterTxt}}</a>
+			</div>
+		</div>
+
+		<div class="center-bg" v-show="isLoggedInFlag" v-on:click="footerVM.goTo('/personal-info')">
+			<div class="center-left">
+				<img src="images/header.png"/>
+				<span>{{userName}}</span>
+			</div>
+
+			<div>
+				<div class="center-right">
+					<div class="center-le">
+						<p>账户余额</p >
+						<p>{{cashDeposit != null ? cashDeposit : 0}}{{global.systemSetting.currencyUnit}}</p >
+					</div>
+					<img src="images/jiantou2.png"/>
+				</div>
+				<div class="center-right">
+					<div class="center-le">
+						<p>冻结余额</p >
+						<p>{{freezeAmount > 0 ? freezeAmount : 0}}{{global.systemSetting.currencyUnit}}</p >
+					</div>
+				</div>
+			</div>
+		</div>
+			<div class="center-menu">
+				<h3>我的功能</h3>
+				<div class="menu-list">
+					<a href="#" v-on:click="footerVM.goTo('/recharge')">
+						<img src="images/menu1.png"/>
+						<p>充值</p>
+					</a>
+					 <a href="#" v-on:click="footerVM.goTo('/withdraw')">
+						<img src="images/menu2.png"/>
+						<p>提现</p>
+					</a>
+					<a href="#" v-on:click="footerVM.goTo('/recharge-withdraw-log')">
+						<img src="images/menu3.png"/>
+						<p>充提记录</p>
+					</a>
+					<a href="#"  v-on:click="footerVM.goTo('/gathering-code')">
+						<img src="images/menu4.png"/>
+						<p>收款码</p>
+					</a>
+					<a href="#" v-on:click="footerVM.goTo('/receive-order-record')">
+						<img src="images/menu5.png"/>
+						<p>接单记录</p>
+					</a>
+					<a href="#" v-on:click="footerVM.goTo('/appeal-record')">
+						<img src="images/menu6.png"/>
+						<p>申述记录</p>
+					</a>
+					<a href="#" v-on:click="footerVM.goTo('/personal-account-change')">
+						<img src="images/menu7.png"/>
+						<p>账变记录</p>
+					</a>
+					<a href="#" v-on:click="footerVM.goTo('/receive-order-situation')">
+						<img src="images/menu8.png"/>
+						<p>接单统计</p>
+					</a>
+					<a href="#" v-on:click="footerVM.goTo('/realname-certification')">
+						<img src="images/wode2.png"/>
+						<p>实名认证</p>
+					</a>
+					<a href="#" v-on:click="appMonitor">
+						<img src="images/menu13.png"/>
+						<p>APP监控</p>
+					</a>
+				</div>
+
+			</div>
+			<div class="center-menu">
+				<h3>系统功能</h3>
+				<div class="menu-list">
+					<a href="#" v-show="isLoggedInFlag && accountType == 'agent'" v-on:click="footerVM.goTo('/agent-center')">
+						<img src="images/menu9.png"/>
+						<p>代理中心</p>
+					</a>
+					<a href="#" v-on:click="footerVM.goTo('/system-notice')">
+						<img src="images/menu10.png"/>
+						<p>系统公告</p>
+					</a>
+					<a href="#" v-on:click="footerVM.goTo('/online-customer')">
+						<img src="images/menu11.png"/>
+						<p>在线客服</p>
+					</a>
+					<a href="#"  v-on:click="logout" v-show="isLoggedInFlag">
+						<img src="images/menu12.png"/>
+						<p>退出登录</p>
+					</a>
+				</div>
+
+			</div>
+		</div>
+
+
+		<!-- <div class="page-body">
+			<div class="login-or-register" v-show="!isLoggedInFlag">
+				<button type="button" class="btn btn-lg btn-danger" v-on:click="footerVM.goTo('/login')">{{loginOrRegisterTxt}}</button>
+			</div>
+			<div class="account-info" v-show="isLoggedInFlag" v-on:click="footerVM.goTo('/personal-info')">
+				<div class="user-name">
+					<div>
+						<label>{{userName}}</label>
+					</div>
+				</div>
+				<div class="cash-deposit">
+					<div class="cash-deposit-area">
+						<span>账户余额:</span><label>{{cashDeposit != null ? cashDeposit : 0}}{{global.systemSetting.currencyUnit}}</label>
+					</div>
+					<div class="freeze-amount-area" v-show="freezeAmount > 0">
+						<span>冻结:</span><label>{{freezeAmount}}{{global.systemSetting.currencyUnit}}</label>
+					</div>
+				</div>
+				<div class="personal-info">
+					<label><i class="fa fa-angle-right" aria-hidden="true"></i></label>
+				</div>
+			</div>
+			<div>
+				<nav class="navbar bg-light footer-navbar home-page-nav">
+					<a class="navbar-brand footer-navbar-brand" v-on:click="footerVM.goTo('/recharge')"><i class="fa fa-jpy" aria-hidden="true"></i> <span>充值</span> </a> <a class="navbar-brand footer-navbar-brand"
+						v-on:click="footerVM.goTo('/withdraw')"><i class="fa fa-money" aria-hidden="true"></i> <span>提现</span> </a> <a class="navbar-brand footer-navbar-brand"
+						v-on:click="footerVM.goTo('/recharge-withdraw-log')"><i class="fa fa-hdd-o" aria-hidden="true"></i> <span>个人充提</span> </a>
+				</nav>
+				<nav class="navbar bg-light footer-navbar home-page-nav">
+					<a class="navbar-brand footer-navbar-brand" v-on:click="footerVM.goTo('/gathering-code')"><i class="fa fa-qrcode" aria-hidden="true"></i> <span>收款码</span> </a> <a
+						class="navbar-brand footer-navbar-brand" v-on:click="footerVM.goTo('/receive-order-record')"><i class="fa fa-list-ul" aria-hidden="true"></i> <span>接单记录</span> </a> <a
+						class="navbar-brand footer-navbar-brand" v-on:click="footerVM.goTo('/appeal-record')"><i class="fa fa-clock-o" aria-hidden="true"></i> <span>申诉记录</span> </a>
+				</nav>
+				<nav class="navbar bg-light footer-navbar home-page-nav">
+					<a class="navbar-brand footer-navbar-brand" v-on:click="footerVM.goTo('/personal-account-change')"><i class="fa fa-book" aria-hidden="true"></i> <span>个人帐变</span> </a> <a
+						class="navbar-brand footer-navbar-brand" v-on:click="footerVM.goTo('/receive-order-situation')"><i class="fa fa-calculator" aria-hidden="true"></i> <span>接单情况</span> </a> <a
+						class="navbar-brand footer-navbar-brand"><span></span> </a>
+					<a class="navbar-brand footer-navbar-brand" v-on:click="footerVM.goTo('http://www.dmjwzw.cn/q7/3.html')"><i class="fa fa-download" aria-hidden="true"></i><span>下载app</span> </a>
+				</nav>
+			</div>
+			<ul class="list-group">
+				<li class="list-group-item" v-show="isLoggedInFlag && accountType == 'agent'" v-on:click="footerVM.goTo('/agent-center')">代理中心<span><i aria-hidden="true" class="fa fa-angle-right"></i></span>
+				</li>
+				<li class="list-group-item" v-on:click="footerVM.goTo('/system-notice')">系统公告<span><i aria-hidden="true" class="fa fa-angle-right"></i></span></li>
+				<li class="list-group-item" v-on:click="footerVM.goTo('/online-customer')">在线客服<span><i aria-hidden="true" class="fa fa-angle-right"></i></span>
+				</li>
+				<li class="list-group-item logout-group-item" v-show="isLoggedInFlag" v-on:click="logout">退出登录<span><i aria-hidden="true" class="fa fa-angle-right"></i></span></li>
+			</ul>
+		</div> -->
+
+	</div>
+	<div th:replace="common/footer-new::html"></div>
+	<link href="/css/common/theme-brown.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript">
+		var myHomePageVM = new Vue({
+			el : '#myHomePage',
+			data : {
+				global : GLOBAL,
+				loginOrRegisterTxt : '',
+				appMonitorUrl : '',
+				isLoggedInFlag : false,
+				userName : '',
+				cashDeposit : '',
+				accountType : '',
+				freezeAmount : 0,
+			},
+			computed : {},
+			created : function() {
+			},
+			mounted : function() {
+				headerVM.title = '我的主页';
+				headerVM.showHeaderFlag = false;
+				this.loadRegisterSetting();
+				this.getUserAccountInfo();
+			},
+			methods : {
+				goTo : function(url) {
+					window.location.href = url;
+				},
+				appMonitor : function() {
+					var that = this;
+					if(that.appMonitorUrl != '' && that.appMonitorUrl != null){
+						window.location.href = that.appMonitorUrl;
+					}
+				},
+				loadRegisterSetting : function() {
+					var that = this;
+					that.$http.get('/masterControl/getRegisterSetting').then(function(res) {
+						that.loginOrRegisterTxt = res.body.data.registerEnabled ? '登录/注册' : '登录';
+						that.appMonitorUrl = res.body.data.appMonitorUrl;
+					});
+				},
+
+				/**
+				 * 获取用户账号信息
+				 */
+				getUserAccountInfo : function() {
+					var that = this;
+					that.$http.get('/userAccount/getUserAccountInfo').then(function(res) {
+						if (res.body.data != null) {
+							that.isLoggedInFlag = true;
+							that.userName = res.body.data.userName;
+							that.cashDeposit = res.body.data.cashDeposit;
+							that.accountType = res.body.data.accountType;
+							that.getFreezeAmount();
+						}
+					});
+				},
+
+				getFreezeAmount : function() {
+					var that = this;
+					that.$http.get('/userAccount/getFreezeAmount').then(function(res) {
+						if (res.body.data != null) {
+							that.freezeAmount = res.body.data;
+						}
+					});
+				},
+
+				logout : function() {
+					this.$http.post('/logout').then(function(res) {
+						window.location.href = '/my-home-page';
+					});
+				}
+			}
+		});
+	</script>
+</body>
+</html>

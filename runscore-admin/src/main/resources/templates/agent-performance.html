@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<title>代理业绩</title>
+<link href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<script src="https://cdn.staticfile.org/echarts/4.2.1-rc1/echarts.min.js"></script>
+<script src="https://cdn.staticfile.org/dayjs/1.7.8/dayjs.min.js"></script>
+<link href="/css/common/common.css" rel="stylesheet" type="text/css">
+<script src="/js/common/common.js"></script>
+<style type="text/css">
+.analysis-row1 {
+	margin-left: 20px;
+	margin-right: 20px;
+	padding-top: 20px;
+}
+
+.analysis-card {
+	color: #fff;
+	border-radius: 6px;
+	background: #2c3448;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	margin-right: 26px;
+}
+
+.analysis-card-gathering {
+	flex: 0 0 23%;
+	max-width: 23%;
+	margin-right: 34px;
+}
+
+.analysis-card-summary {
+	box-shadow: 0px 8px 6px #888888;
+}
+
+.analysis-card-gathering:last-child {
+	margin-right: 0px;
+}
+
+.analysis-card-row1 {
+
+}
+
+.analysis-card-row2 {
+	padding-left: 33px;
+    font-size: 24px;
+	padding-bottom: 10px;
+	color: #26dad0;
+	font-weight: bold;
+}
+
+.analysis-card-row3 {
+	display: flex;
+	justify-content: space-between;
+}
+
+.index-label {
+	color: #999;
+}
+
+.index-value {
+	font-weight: bold;
+}
+
+.index-value-amount {
+	color: #26dad0;
+}
+
+.analysis-row2 {
+	margin-left: 20px;
+	margin-right: 20px;
+	padding-top: 20px;
+}
+
+.merchant-trade-situation-table {
+	border-bottom: 0 !important;
+}
+
+.merchant-trade-situation-table thead th {
+	border-bottom: 0;
+	text-align: center;
+	font-size: 14px;
+	font-weight: bold;
+	background: #2c3448;
+	color: #fff;
+	border-radius: 6px;
+}
+
+.merchant-trade-situation-table tr td {
+	text-align: center;
+	border-left: 0;
+	background: #2c3448;
+	color: #26dad0;
+	border-radius: 6px;
+}
+
+.trade-order-num {
+	cursor: pointer;
+}
+
+.merchant-trade-situation-title {
+	text-align: unset !important;
+}
+
+.merchant-trade-situation-title .badge {
+	cursor: pointer;
+}
+
+.merchant-trade-situation-switch-area {
+	padding-right: 22rem;
+}
+
+.merchant-trade-situation-title label {
+	margin-bottom: 0;
+}
+</style>
+</head>
+<body>
+	<div th:replace="common/header::html"></div>
+	<div id="agent-performance" v-cloak>
+
+		<div class="row analysis-row2">
+			<div class="col-sm-12">
+				<table class="table table-hover table-bordered merchant-trade-situation-table">
+					<thead>
+						<tr>
+							<th class="merchant-trade-situation-title" colspan="6"><label class="merchant-trade-situation-switch-area"> <span class="badge" v-bind:class="queryRScope == 'total' ? 'badge-primary' : 'badge-secondary'" v-on:click="queryRScope = 'total'">累计业绩</span> <span class="badge" v-bind:class="queryRScope == 'month' ? 'badge-primary' : 'badge-secondary'" v-on:click="queryRScope = 'month'">本月业绩</span> <span class="badge" v-bind:class="queryRScope == 'yesterday' ? 'badge-primary' : 'badge-secondary'" v-on:click="queryRScope = 'yesterday'">昨日业绩</span> <span class="badge" v-bind:class="queryRScope == 'today' ? 'badge-primary' : 'badge-secondary'" v-on:click="queryRScope = 'today'">今日业绩</span>
+							</label> <label>各总代理业绩</label></th>
+						</tr>
+						<tr>
+							<th>总代理名称</th>
+
+							<th v-show="queryRScope == 'total'">累计收款</th>
+							<th v-show="queryRScope == 'total'">累计订单</th>
+							<th v-show="queryRScope == 'total'">累计成交</th>
+
+							<th v-show="queryRScope == 'month'">本月收款</th>
+							<th v-show="queryRScope == 'month'">本月订单</th>
+							<th v-show="queryRScope == 'month'">本月成交</th>
+
+							<th v-show="queryRScope == 'yesterday'">昨日收款</th>
+							<th v-show="queryRScope == 'yesterday'">昨日订单</th>
+							<th v-show="queryRScope == 'yesterday'">昨日成交</th>
+
+							<th v-show="queryRScope == 'today'">今日收款</th>
+							<th v-show="queryRScope == 'today'">今日订单</th>
+							<th v-show="queryRScope == 'today'">今日成交</th>
+
+							<th>成功率</th>
+							<!-- <th>奖励金</th> -->
+						</tr>
+					</thead>
+					<tbody>
+						 <tr v-for="situation in merchantTradeResultsSituations">
+							<td>{{situation.userName}}</td>
+							<td v-show="queryRScope == 'total'">{{situation.totalTradeAmount}}{{global.systemSetting.currencyUnit}}</td>
+							<td v-show="queryRScope == 'total'" >{{situation.totalOrderNum}}笔</td>
+							<td v-show="queryRScope == 'total'" >{{situation.totalPaidOrderNum}}笔</td>
+							<td v-show="queryRScope == 'total'">{{situation.totalSuccessRate}}%</td>
+
+							<td v-show="queryRScope == 'month'">{{situation.monthTradeAmount}}{{global.systemSetting.currencyUnit}}</td>
+							<td v-show="queryRScope == 'month'" >{{situation.monthOrderNum}}笔</td>
+							<td v-show="queryRScope == 'month'" >{{situation.monthPaidOrderNum}}笔</td>
+							<td v-show="queryRScope == 'month'">{{situation.monthSuccessRate}}%</td>
+
+							<td v-show="queryRScope == 'yesterday'">{{situation.yesterdayTradeAmount}}{{global.systemSetting.currencyUnit}}</td>
+							<td v-show="queryRScope == 'yesterday'" >{{situation.yesterdayOrderNum}}笔</td>
+							<td v-show="queryRScope == 'yesterday'" >{{situation.yesterdayPaidOrderNum}}笔</td>
+							<td v-show="queryRScope == 'yesterday'">{{situation.yesterdaySuccessRate}}%</td>
+
+							<td v-show="queryRScope == 'today'">{{situation.todayTradeAmount}}{{global.systemSetting.currencyUnit}}</td>
+							<td v-show="queryRScope == 'today'" >{{situation.todayOrderNum}}笔</td>
+							<td v-show="queryRScope == 'today'" >{{situation.todayPaidOrderNum}}笔</td>
+							<td v-show="queryRScope == 'today'">{{situation.todaySuccessRate}}%</td>
+							<!-- <td v-show="queryRScope == 'today'">{{situation.todayBounty}}{{global.systemSetting.currencyUnit}}</td> -->
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<script src="/js/agent-performance.js"></script>
+</body>
+</html>

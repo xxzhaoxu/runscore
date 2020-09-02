@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<title>费率详情</title>
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<link href="/css/common/common.css" rel="stylesheet" type="text/css">
+<script src="/js/common/common.js"></script>
+<style type="text/css">
+.rate-tip {
+	text-align: center;
+	padding-bottom: 1rem;
+	font-size: 20px;
+}
+</style>
+</head>
+
+<body>
+	<div th:replace="common/header::html"></div>
+	<div id="rate-details" v-cloak>
+		<div class="card">
+			<div class="card-header">费率详情</div>
+			<div class="card-body">
+				<div class="rate-tip">需要变更通道及调整费率请联系客服</div>
+				<table class="table table-hover common-table">
+					<thead>
+						<tr>
+							<th>通道code</th>
+							<th>通道名称</th>
+							<th>费率</th>
+							<th>状态</th>
+							<th>创建时间</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="channelRate in channelRates">
+							<td>{{channelRate.channelCode}}</td>
+							<td>{{channelRate.channelName}}</td>
+							<td>{{channelRate.rate}}%</td>
+							<td>{{channelRate.enabled ? '启用' : '关闭'}}</td>
+							<td>{{channelRate.createTime}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<script src="/js/rate-details.js"></script>
+</body>
+</html>

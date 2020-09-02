@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>接单情况</title>
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<link href="/css/common/common.css" rel="stylesheet" type="text/css">
+<script src="/js/common/common.js"></script>
+<style type="text/css">
+.gathering-item {
+	
+}
+
+.gathering-item label {
+	text-align: end;
+	width: 8rem;
+	margin-right: 2rem;
+	color: #495057;
+	font-weight: bold;
+}
+
+.gathering-item span {
+	color: #0062cc;
+	font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+	<div th:replace="common/header::html"></div>
+	<div id="index" v-cloak>
+		<div class="page-body">
+			<div class="card">
+				<div class="card-header">
+					<span>今日接单情况</span>
+				</div>
+				<div class="card-body">
+					<div class="row gathering-item">
+						<div class="col-sm-8 offset-sm-4">
+							<label>今日收款金额</label> <span>{{todayReceiveOrderSituation != null ? todayReceiveOrderSituation.paidAmount : 0}}{{global.systemSetting.currencyUnit}}</span>
+						</div>
+					</div>
+					<div class="row gathering-item">
+						<div class="col-sm-8 offset-sm-4">
+							<label>今日已支付订单量</label> <span>{{todayReceiveOrderSituation != null ? todayReceiveOrderSituation.paidOrderNum : 0}}笔</span>
+						</div>
+					</div>
+					<div class="row gathering-item">
+						<div class="col-sm-8 offset-sm-4">
+							<label>今日订单量</label> <span>{{todayReceiveOrderSituation != null ? todayReceiveOrderSituation.orderNum : 0}}笔</span>
+						</div>
+					</div>
+					<div class="row gathering-item">
+						<div class="col-sm-8 offset-sm-4">
+							<label>今日奖励金</label> <span>{{todayReceiveOrderSituation != null ? todayReceiveOrderSituation.bounty : 0}}{{global.systemSetting.currencyUnit}}</span>
+						</div>
+					</div>
+					<div class="row gathering-item">
+						<div class="col-sm-8 offset-sm-4">
+							<label>成功率</label> <span>{{todayReceiveOrderSituation != null ? todayReceiveOrderSituation.successRate : 0}}%</span>
+						</div>
+					</div>
+					<div class="row gathering-item" v-show="accountType == 'agent'">
+						<div class="col-sm-8 offset-sm-4">
+							<label>今日代理佣金</label> <span>{{todayReceiveOrderSituation != null ? todayReceiveOrderSituation.rebateAmount : 0}}{{global.systemSetting.currencyUnit}}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="card">
+				<div class="card-header">
+					<span>累计接单情况</span>
+				</div>
+				<div class="card-body">
+					<div class="row gathering-item">
+						<div class="col-sm-8 offset-sm-4">
+							<label>累计收款金额</label> <span>{{totalReceiveOrderSituation != null ? totalReceiveOrderSituation.paidAmount : 0}}{{global.systemSetting.currencyUnit}}</span>
+						</div>
+					</div>
+					<div class="row gathering-item">
+						<div class="col-sm-8 offset-sm-4">
+							<label>累计已支付订单量</label> <span>{{totalReceiveOrderSituation != null ? totalReceiveOrderSituation.paidOrderNum : 0}}笔</span>
+						</div>
+					</div>
+					<div class="row gathering-item">
+						<div class="col-sm-8 offset-sm-4">
+							<label>累计订单量</label> <span>{{totalReceiveOrderSituation != null ? totalReceiveOrderSituation.orderNum : 0}}笔</span>
+						</div>
+					</div>
+					<div class="row gathering-item">
+						<div class="col-sm-8 offset-sm-4">
+							<label>累计奖励金</label> <span>{{totalReceiveOrderSituation != null ? totalReceiveOrderSituation.bounty : 0}}{{global.systemSetting.currencyUnit}}</span>
+						</div>
+					</div>
+					<div class="row gathering-item">
+						<div class="col-sm-8 offset-sm-4">
+							<label>成功率</label> <span>{{totalReceiveOrderSituation != null ? totalReceiveOrderSituation.successRate : 100}}%</span>
+						</div>
+					</div>
+					<div class="row gathering-item" v-show="accountType == 'agent'">
+						<div class="col-sm-8 offset-sm-4">
+							<label>累计代理佣金</label> <span>{{totalReceiveOrderSituation != null ? totalReceiveOrderSituation.rebateAmount : 0}}{{global.systemSetting.currencyUnit}}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div th:replace="common/footer::html"></div>
+	<link href="/css/common/theme-brown.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript">
+		var indexVM = new Vue({
+			el : '#index',
+			data : {
+				global : GLOBAL,
+				accountType : '',
+				todayReceiveOrderSituation : {},
+				totalReceiveOrderSituation : {},
+			},
+			computed : {},
+			created : function() {
+			},
+			mounted : function() {
+				headerVM.title = '接单情况';
+				headerVM.showBackFlag = true;
+				this.getUserAccountInfo();
+				this.loadTodayReceiveOrderSituation();
+				this.loadTotalReceiveOrderSituation();
+			},
+			methods : {
+
+				getUserAccountInfo : function() {
+					var that = this;
+					that.$http.get('/userAccount/getUserAccountInfo').then(function(res) {
+						that.accountType = res.body.data.accountType;
+					});
+				},
+
+				loadTodayReceiveOrderSituation : function() {
+					var that = this;
+					that.$http.get('/statisticalAnalysis/findMyTodayReceiveOrderSituation').then(function(res) {
+						that.todayReceiveOrderSituation = res.body.data;
+					});
+				},
+
+				loadTotalReceiveOrderSituation : function() {
+					var that = this;
+					that.$http.get('/statisticalAnalysis/findMyTotalReceiveOrderSituation').then(function(res) {
+						that.totalReceiveOrderSituation = res.body.data;
+					});
+				}
+			}
+		});
+	</script>
+</body>
+</html>

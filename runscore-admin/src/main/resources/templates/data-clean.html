@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<title>数据清理</title>
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<link href="/css/common/common.css" rel="stylesheet" type="text/css">
+<script src="/js/common/common.js"></script>
+<style type="text/css">
+.data-clean-container {
+	padding-right: 44px;
+	padding-left: 44px;
+	padding-top: 15px;
+}
+
+.data-clean-row {
+	padding-bottom: 4rem;
+}
+
+.data-clean-title {
+	text-align: center;
+	font-weight: bold;
+	font-size: 22px;
+	padding-bottom: 3rem;
+}
+
+.data-clean-item {
+	font-size: 18px;
+}
+
+.appeal-details-item-highlight {
+	color: #ef061e;
+}
+
+.data-clean-item label {
+	padding-right: 20px;
+	color: #757b82;
+}
+
+.data-clean-item span {
+	
+}
+
+.data-clean-item .custom-control-inline {
+	margin-right: 0.5rem;
+}
+
+.data-clean-item-date input {
+	width: 30%;
+	padding-left: 7rem;
+}
+
+.data-clean-action {
+	text-align: center;
+	padding-top: 10px;
+}
+
+.data-clean-tip {
+	color: red;
+	font-weight: bold;
+	text-align: center;
+	justify-content: center;
+	padding-bottom: 2rem;
+	font-size: 30px;
+}
+</style>
+</head>
+
+<body>
+	<div th:replace="common/header::html"></div>
+	<div id="data-clean" v-cloak>
+		<div class="data-clean-container">
+			<div class="data-clean-title">数据清理</div>
+			<div class="row data-clean-row">
+				<div class="col-sm-12 data-clean-item">
+					<label>数据类型:</label><span>
+						<div class="custom-control custom-checkbox custom-control-inline" v-for="dataType in dataTypes">
+							<input type="checkbox" class="custom-control-input" :id="dataType.type" v-model="dataType.selectedFlag"> <label class="custom-control-label" :for="dataType.type">{{dataType.name}}</label>
+						</div>
+					</span>
+				</div>
+			</div>
+			<div class="row data-clean-row">
+				<div class="col-sm-12 data-clean-item data-clean-item-date">
+					<label>数据时间范围:</label><span> <input type="date" class="form-control-sm" v-model="startTime"><span>到</span><input type="date" class="form-control-sm" v-model="endTime">
+					</span>
+				</div>
+			</div>
+			<div class="row data-clean-tip">清理过的数据是不能恢复的,请谨慎操作!</div>
+			<div class="data-clean-action">
+				<button type="button" class="btn btn-danger btn-lg" v-on:click="dataClean">确定清理数据</button>
+			</div>
+		</div>
+	</div>
+	<script src="/js/data-clean.js"></script>
+</body>
+</html>

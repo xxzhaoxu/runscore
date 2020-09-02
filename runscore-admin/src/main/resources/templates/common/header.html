@@ -1,0 +1,386 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta name="renderer" content="webkit|ie-comp|ie-stand" />
+<meta name="description" content="a31daeb0581dcf08de10e07d4f1aa971" />
+<link href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<script src="https://cdn.staticfile.org/layer/2.3/layer.js"></script>
+<style>
+.dropdown-item.active {
+	color: #fff !important;
+}
+
+.unread-msg-nav-item {
+	width: 70px;
+	text-align: center;
+}
+
+.unread-msg-nav-item .label {
+	background-color: #00a65a !important;
+	position: relative;
+	top: -7px;
+	right: -3px;
+	text-align: center;
+	font-size: 9px;
+	width: 21px;
+	height: 14px;
+	line-height: 14px;
+	display: inline-block;
+}
+
+.game-category-nav {
+	display: inline-flex;
+	height: 47px;
+	line-height: 29px;
+}
+
+.msg-nav .nav-item {
+	min-width: 105px;
+	text-align: center;
+}
+
+.msg-nav a {
+	color: #666;
+}
+
+.selected-msg-nav-item {
+	border-bottom: 2px solid #5584ff;
+}
+
+.selected-msg-nav-item a {
+	color: #007bff;
+}
+
+.todo-table tbody tr {
+	cursor: pointer;
+}
+
+.unread-num {
+	position: relative;
+	top: -4px;
+	left: 11px;
+	display: inline-block;
+	padding: 0 6px;
+	font-size: 12px;
+	text-align: center;
+	background-color: #FF5722;
+	color: #fff;
+	border-radius: 2px;
+}
+
+.msg-center-dialog {
+	max-width: 100%;
+	width: 50%;
+}
+</style>
+</head>
+<body>
+
+	<div id="header" v-cloak>
+		<nav class="navbar navbar-expand-sm bg-info navbar-dark" style="justify-content: space-between;">
+			<ul class="navbar-nav">
+				<template v-for="(menu, index) in menus">
+				<li class="nav-item" v-if="menu.subMenus.length == 0" v-bind:class="{'active': currentPathName == menu.url}" v-on:click="navTo(menu.url)"><a class="nav-link">{{menu.title}}</a></li>
+				<li class="nav-item dropdown" v-if="menu.subMenus.length > 0" v-bind:class="{'active': parentMenuActive(menu.subMenus)}"><a class="nav-link dropdown-toggle" data-toggle="dropdown">{{menu.title}}</a>
+					<div class="dropdown-menu">
+						<a class="dropdown-item" v-for="subMenu in menu.subMenus" v-bind:class="{'active': currentPathName == subMenu.url}" v-on:click="navTo(subMenu.url)">{{subMenu.title}}</a>
+					</div></li>
+				</template>
+			</ul>
+
+			<ul class="navbar-nav" style="float: right;">
+				<li class="nav-item unread-msg-nav-item" v-on:click="showMsgCenterModal"><a class="nav-link"><i class="fa fa-bell"></i><span class="label label-success">{{todoNum > 99 ? '99' : todoNum}}</span></a></li>
+				<li class="nav-item dropdown"><a class="nav-link dropdown-toggle" data-toggle="dropdown">{{userName}}</a>
+					<div class="dropdown-menu dropdown-menu-right">
+						<a class="dropdown-item" v-on:click="logout"><i class="fa fa-sign-out"></i>退出登录</a>
+					</div></li>
+			</ul>
+		</nav>
+
+		<div v-if="showMsgCenterFlag">
+			<div class="modal-mask">
+				<div class="modal-wrapper">
+					<div class="modal-dialog msg-center-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">消息中心</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="showMsgCenterFlag = false">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<ul class="nav msg-nav">
+									<li class="nav-item" v-bind:class="{'selected-msg-nav-item': selectedTab == 'appeal'}" v-on:click="selectedTab = 'appeal'"><a class="nav-link">申诉<span class="unread-num">{{todoAppealNum}}</span></a></li>
+									<li class="nav-item" v-bind:class="{'selected-msg-nav-item': selectedTab == 'recharge'}" v-on:click="selectedTab = 'recharge'"><a class="nav-link">充值<span class="unread-num">{{todoRechargeNum}}</span></a></li>
+									<li class="nav-item" v-bind:class="{'selected-msg-nav-item': selectedTab == 'withdraw'}" v-on:click="selectedTab = 'withdraw'"><a class="nav-link">提现<span class="unread-num">{{todoWithdrawNum}}</span></a></li>
+									<li class="nav-item" v-bind:class="{'selected-msg-nav-item': selectedTab == 'settlement'}" v-on:click="selectedTab = 'settlement'"><a class="nav-link">结算<span class="unread-num">{{todoSettlementNum}}</span></a></li>
+									<li class="nav-item" v-bind:class="{'selected-msg-nav-item': selectedTab == 'auditGatheringCode'}" v-on:click="selectedTab = 'auditGatheringCode'"><a class="nav-link">审核收款码<span class="unread-num">{{todoAuditGatheringCodeNum}}</span></a></li>
+								</ul>
+								<table class="table table-hover common-table todo-table" v-show="selectedTab == 'appeal'">
+									<thead>
+										<tr>
+											<th>商户</th>
+											<th>申诉类型</th>
+											<th>发起时间</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="todo in todoAppeals" v-on:click="navTo('/appeal-details?id=' + todo.id)">
+											<td>{{todo.merchantName}}</td>
+											<td>{{todo.appealTypeName}}</td>
+											<td>{{todo.initiationTime}}</td>
+										</tr>
+										<tr v-show="todoAppeals.length == 0">
+											<td colspan="3">暂无记录</td>
+										</tr>
+									</tbody>
+								</table>
+								<table class="table table-hover common-table todo-table" v-show="selectedTab == 'recharge'">
+									<thead>
+										<tr>
+											<th>充值用户</th>
+											<th>充值金额</th>
+											<th>提交时间</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="todo in todoRecharges" v-on:click="navTo('/recharge-order?orderState=1&todoId=' + todo.id)">
+											<td>{{todo.userName}}</td>
+											<td>{{todo.rechargeAmount}}</td>
+											<td>{{todo.submitTime}}</td>
+										</tr>
+										<tr v-show="todoRecharges.length == 0">
+											<td colspan="3">暂无记录</td>
+										</tr>
+									</tbody>
+								</table>
+								<table class="table table-hover common-table todo-table" v-show="selectedTab == 'withdraw'">
+									<thead>
+										<tr>
+											<th>提现用户</th>
+											<th>提现金额</th>
+											<th>提交时间</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="todo in todoWithdraws" v-on:click="navTo('/withdraw-record?state=1&todoId=' + todo.id)">
+											<td>{{todo.userName}}</td>
+											<td>{{todo.withdrawAmount}}</td>
+											<td>{{todo.submitTime}}</td>
+										</tr>
+										<tr v-show="todoWithdraws.length == 0">
+											<td colspan="3">暂无记录</td>
+										</tr>
+									</tbody>
+								</table>
+								<table class="table table-hover common-table todo-table" v-show="selectedTab == 'settlement'">
+									<thead>
+										<tr>
+											<th>商户</th>
+											<th>提现金额</th>
+											<th>申请时间</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="todo in todoSettlements" v-on:click="navTo('/merchant-settlement-record?state=1&todoId=' + todo.id)">
+											<td>{{todo.merchantName}}</td>
+											<td>{{todo.withdrawAmount}}</td>
+											<td>{{todo.applyTime}}</td>
+										</tr>
+										<tr v-show="todoSettlements.length == 0">
+											<td colspan="3">暂无记录</td>
+										</tr>
+									</tbody>
+								</table>
+								<table class="table table-hover common-table todo-table" v-show="selectedTab == 'auditGatheringCode'">
+									<thead>
+										<tr>
+											<th>所属账号</th>
+											<th>操作类型</th>
+											<th>发起时间</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="todo in todoAuditGatheringCodes" v-on:click="navTo('/gathering-code?state=2&todoId=' + todo.id)">
+											<td>{{todo.userName}}</td>
+											<td>{{todo.auditTypeName}}收款码</td>
+											<td>{{todo.initiateAuditTime}}</td>
+										</tr>
+										<tr v-show="todoAuditGatheringCodes.length == 0">
+											<td colspan="3">暂无记录</td>
+										</tr>
+									</tbody>
+								</table>
+								<button type="button" class="btn btn-primary btn-block" v-on:click="showMoreTodo">查看更多</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<template v-if="playAudioFlag"> <iframe autoplay="autoplay" src="audio/ring.wav" style="display: none;"></iframe> </template>
+	</div>
+	<script type="text/javascript">
+		var header = new Vue({
+			el : '#header',
+			data : {
+				userName : '',
+				currentPathName : '',
+				menus : [],
+				showMsgCenterFlag : '',
+				selectedTab : 'appeal',
+				todoNum : sessionStorage.getItem('todoNum') == null ? 0 : sessionStorage.getItem('todoNum'),
+				todoRecharges : [],
+				todoRechargeNum : '',
+				todoWithdraws : [],
+				todoWithdrawNum : '',
+				todoAppeals : [],
+				todoAppealNum : '',
+				todoSettlements : [],
+				todoSettlementNum : '',
+				todoAuditGatheringCodes : [],
+				todoAuditGatheringCodeNum : '',
+				homePageUrl : '',
+				playAudioFlag : false,
+			},
+			computed : {},
+			created : function() {
+
+			},
+			mounted : function() {
+				var that = this;
+				that.currentPathName = window.location.pathname;
+				that.getUserAccountInfo();
+				that.loadTodoMsg();
+				that.loadMenus();
+				window.setInterval(function() {
+					that.loadTodoMsg();
+				}, 9000);
+			},
+			methods : {
+
+				showMoreTodo : function() {
+					if (this.selectedTab == 'appeal') {
+						this.navTo('/appeal-record?appealState=1');
+					} else if (this.selectedTab == 'recharge') {
+						this.navTo('/recharge-order?orderState=1');
+					} else if (this.selectedTab == 'withdraw') {
+						this.navTo('/withdraw-record?state=1');
+					} else if (this.selectedTab == 'settlement') {
+						this.navTo('/merchant-settlement-record?state=1');
+					} else if (this.selectedTab == 'auditGatheringCode') {
+						this.navTo('/gathering-code?state=2');
+					}
+				},
+
+				showMsgCenterModal : function() {
+					this.showMsgCenterFlag = true;
+					this.selectedTab = 'appeal';
+				},
+
+				loadTodoMsg : function() {
+					var that = this;
+					that.$http.get('/msg/findTodoMsg').then(function(res) {
+						that.playAudioFlag = false;
+						that.todoRecharges = res.body.data.recharge.content;
+						that.todoRechargeNum = res.body.data.recharge.total;
+						that.todoWithdraws = res.body.data.withdraw.content;
+						that.todoWithdrawNum = res.body.data.withdraw.total;
+						that.todoAppeals = res.body.data.appeal.content;
+						that.todoAppealNum = res.body.data.appeal.total;
+						that.todoSettlements = res.body.data.settlement.content;
+						that.todoSettlementNum = res.body.data.settlement.total;
+						that.todoAuditGatheringCodes = res.body.data.auditGatheringCode.content;
+						that.todoAuditGatheringCodeNum = res.body.data.auditGatheringCode.total;
+						var lastTimeTodoNum = that.todoNum;
+						var todoNum = that.todoRechargeNum + that.todoWithdrawNum + that.todoAppealNum + that.todoSettlementNum + that.todoAuditGatheringCodeNum;
+						if (lastTimeTodoNum != null && lastTimeTodoNum < todoNum) {
+							that.playAudioFlag = true;
+						}
+						that.todoNum = todoNum;
+						sessionStorage.setItem('todoNum', that.todoNum);
+					});
+				},
+
+				/**
+				 * 获取用户账号信息
+				 */
+				getUserAccountInfo : function() {
+					var that = this;
+					that.$http.get('/userAccount/getUserAccountInfo').then(function(res) {
+						if (res.body.data == null) {
+							that.isLoggedInFlag = false;
+						} else {
+							that.userName = res.body.data.userName;
+						}
+					});
+				},
+				/**
+				 * 获取用户菜单
+				 */
+				 loadMenus : function() {
+					var that = this;
+					that.$http.get('/role/selectMenuVOByUserId').then(function(res) {
+						if (res.body.data == null) {
+							that.isLoggedInFlag = false;
+						} else {
+							that.menus = res.body.data;
+						}
+					});
+				},
+
+				logout : function() {
+					this.$http.post('/logout').then(function(res) {
+						layer.open({
+							title : '提示',
+							icon : '1',
+							closeBtn : 0,
+							btn : [],
+							content : '退出成功!',
+							time : 2000,
+							end : function() {
+								window.location.href = '/login';
+							}
+						});
+					});
+				},
+
+				parentMenuActive : function(subMenus) {
+					for (var i = 0; i < subMenus.length; i++) {
+						if (subMenus[i].url == this.currentPathName) {
+							return true;
+						}
+					}
+					return false;
+				},
+
+				navTo : function(url) {
+				 	console.log("跳转的URL:"+ url)
+					if(url.indexOf("pay-online") != -1){
+						var that = this;
+						if(localStorage.getItem("homePageUrl")){
+					        try{
+					        	that.homePageUrl = localStorage.getItem("homePageUrl");
+					        } catch(e){
+					           localStorage.removeItem('homePageUrl');
+					        }
+
+							window.open(that.homePageUrl+url,"_blank");
+					     }else{
+							that.$http.get('/dictconfig/findConfigItemByConfigCode?configCode=homePageUrl').then(function(res) {
+								console.log(res.data)
+								if (res.body.data != null) {
+									that.homePageUrl = res.body.data.configValue;
+									localStorage.setItem('homePageUrl', that.homePageUrl);
+									window.open(that.homePageUrl+url,"_blank");
+								}
+							});
+					     }
+					}else{
+						window.location.href = url;
+					}
+				}
+			}
+		});
+	</script>
+</body>
+</html>

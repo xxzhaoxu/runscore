@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>奖励金排行榜</title>
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<script src="/js/common/common.js"></script>
+<link href="/css/base.css" type="text/css" rel="stylesheet"/>
+<link href="/css/style.css" type="text/css" rel="stylesheet"/>
+<style type="text/css">
+.header-navbar {
+	color: white;
+	display: block;
+	text-align: center;
+	height: 2.5rem;
+	line-height: 1rem;
+	background-color: #dc3545;
+}
+</style>
+</head>
+
+<body>
+	<div th:replace="common/header::html"></div>
+	<div id="index" v-cloak>
+		<div class="wrp-auto" v-show="showTodayBountyRankFlag">
+			<div class="header-bg"></div>
+			<div class="billboard">
+				<div class="bi-title">今日奖励金排行榜</div>
+				<div class="bi-link" v-on:click="showTotalTop10BountyRank">
+					<span>累积排行榜</span>
+					<img src="images/jiantou.png"/>
+				</div>
+			</div>
+			<div class="index-list">
+				<div class="list-title">
+					<h3>排名</h3>
+					<h3>账号</h3>
+					<h3>奖励金</h3>
+				</div>
+				<div class="list-item" v-for="(bountyRank,index) in todayBountyRanks">
+					<img v-if="index==0" src="images/b1.png"/>
+					<img v-else-if ="index==1" src="images/b2.png"/>
+					<img v-else-if ="index==2" src="images/b3.png"/>
+
+						<p v-else>{{(index+1)<10?0:""}}{{index + 1}}</p>
+
+					<span>{{bountyRank.userName}}</span>
+					<span>{{bountyRank.bounty}}</span>
+				</div>
+			</div>
+			<div class="martop"></div>
+		</div>
+		<div class="wrp-auto" v-show="!showTodayBountyRankFlag">
+			<div class="header-bg"></div>
+			<div class="billboard">
+				<div class="bi-title">累计奖励金排行榜</div>
+				<div class="bi-link" v-on:click="showTodayTop10BountyRank">
+					<span>今日排行榜</span>
+					<img src="images/jiantou.png"/>
+				</div>
+			</div>
+			<div class="index-list">
+				<div class="list-title">
+					<h3>排名</h3>
+					<h3>账号</h3>
+					<h3>奖励金</h3>
+				</div>
+				<div class="list-item" v-for="(bountyRank,index) in totalBountyRanks">
+					<img v-if="index==0" src="images/b1.png"/>
+					<img v-else-if ="index==1" src="images/b2.png"/>
+					<img v-else-if ="index==2" src="images/b3.png"/>
+
+						<p v-else>{{(index+1)<10?0:""}}{{index + 1}}</p>
+
+					<span>{{bountyRank.userName}}</span>
+					<span>{{bountyRank.bounty}}</span>
+				</div>
+			</div>
+			<div class="martop"></div>
+		</div>
+
+		<!-- <div class="page-body">
+			<div class="card" v-show="showTodayBountyRankFlag">
+				<div class="card-header">
+					<span>今日奖励金排行榜</span><span class="float-right" style="color: #dc3545; font-weight: bold;" v-on:click="showTotalTop10BountyRank">累计排行榜&gt;</span>
+				</div>
+				<div class="card-body">
+					<table class="table table-sm bounty-ranking-table">
+						<thead>
+							<tr>
+								<th>排行</th>
+								<th>账号</th>
+								<th>奖励金</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="(bountyRank,index) in todayBountyRanks">
+								<td><span class="badge" v-bind:class="[index > 2 ? 'badge-success' : 'badge-danger']">{{index + 1}}</span></td>
+								<td>{{bountyRank.userName}}</td>
+								<td>{{bountyRank.bounty}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="card" v-show="!showTodayBountyRankFlag">
+				<div class="card-header">
+					<span>累计奖励金排行榜</span><span class="float-right" style="color: #dc3545; font-weight: bold;" v-on:click="showTodayTop10BountyRank">今日排行榜&gt;</span>
+				</div>
+				<div class="card-body">
+					<table class="table table-sm bounty-ranking-table">
+						<thead>
+							<tr>
+								<th>排行</th>
+								<th>账号</th>
+								<th>奖励金</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="(bountyRank,index) in totalBountyRanks">
+								<td><span class="badge" v-bind:class="[index > 2 ? 'badge-success' : 'badge-danger']">{{index + 1}}</span></td>
+								<td>{{bountyRank.userName}}</td>
+								<td>{{bountyRank.bounty}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div> -->
+
+	</div>
+	<div th:replace="common/footer-new::html"></div>
+	<link href="/css/common/theme-brown.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript">
+		var indexVM = new Vue({
+			el : '#index',
+			data : {
+				global : GLOBAL,
+				showTodayBountyRankFlag : true,
+				todayBountyRanks : [],
+				totalBountyRanks : []
+			},
+			computed : {},
+			created : function() {
+			},
+			mounted : function() {
+				headerVM.title = '奖励金排行榜';
+				headerVM.showHeaderFlag = false;
+				this.loadTodayTop10BountyRank();
+			},
+			methods : {
+
+				loadTodayTop10BountyRank : function() {
+					var that = this;
+					that.$http.get('/statisticalAnalysis/findTodayTop10BountyRank').then(function(res) {
+						that.todayBountyRanks = res.body.data;
+					});
+				},
+
+				loadTotalTop10BountyRank : function() {
+					var that = this;
+					that.$http.get('/statisticalAnalysis/findTotalTop10BountyRank').then(function(res) {
+						that.totalBountyRanks = res.body.data;
+					});
+				},
+
+				showTodayTop10BountyRank : function() {
+					this.showTodayBountyRankFlag = true;
+					this.loadTodayTop10BountyRank();
+				},
+
+				showTotalTop10BountyRank : function() {
+					this.showTodayBountyRankFlag = false;
+					this.loadTotalTop10BountyRank();
+				}
+			}
+		});
+	</script>
+</body>
+</html>

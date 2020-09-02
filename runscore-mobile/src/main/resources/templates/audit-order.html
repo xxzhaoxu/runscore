@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title></title>
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<link href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<script src="https://cdn.staticfile.org/layer/2.3/layer.js"></script>
+<link href="https://cdn.staticfile.org/bootstrap-fileinput/5.0.1/css/fileinput.min.css" media="all" rel="stylesheet" type="text/css" />
+<script src="https://cdn.staticfile.org/bootstrap-fileinput/5.0.1/js/fileinput.min.js"></script>
+<link href="/css/common/common.css" rel="stylesheet" type="text/css">
+<script src="/js/common/common.js"></script>
+<style type="text/css">
+.form-details {
+	background: rgb(242, 242, 242);
+}
+
+.platform-order-body-item button {
+	width: 48%;
+}
+</style>
+</head>
+
+<body>
+	<div th:replace="common/header::html"></div>
+	<div id="auditOrder" v-cloak>
+
+		<div class="page-body">
+			<div style="color:red;font-size: smaller;padding: 2px 20px;background: rgb(242, 242, 242);margin-bottom: 10px;">
+				重要：真实收到款才点击确认已支付<br/>
+				重要：订单连续超过2个超时，码将会被下线<br/>
+				重要：订单金出现不一致，不要点确认已支付，联系客服报备<br/>
+			</div>
+
+
+			<div v-show="showWaitConfirmOrderFlag">
+				<div class="form-details" v-for="order in waitConfirmOrders">
+					<div class="form-details-body">
+						<div class="form-details-item form-details-item-sm">
+							<label>订单号:</label> <span>{{order.orderNo}}</span>
+						</div>
+						<div class="form-details-item form-details-item-sm">
+							<label>接单时间:</label> <span>{{order.receivedTime}}</span>
+						</div>
+						<div class="form-details-item form-details-item-sm">
+							<label>通道/金额:</label> <span>{{order.gatheringChannelName}}/{{order.gatheringAmount}}{{global.systemSetting.currencyUnit}}</span>
+							<div v-if="order.gatheringChannelCode != 'bankCard'"><label>收款人:</label> <span class="form-details-item-highlight">{{order.payee}}</span></div>
+							<div v-if="order.gatheringChannelCode == 'bankCard'"><label>开户人:</label> <span class="form-details-item-highlight">{{order.accountHolder}}</span></div>
+						</div>
+						<div class="form-details-item form-details-item-sm" v-show="order.attch != null && order.attch != ''">
+							<label>备注:</label> <span>{{order.attch}}</span>
+						</div>
+						<div class="form-details-item form-details-item-sm" v-show="order.orderState == '2'">
+							<button class="btn btn-outline-info" type="button" v-on:click="confirmToPaid(order.id)">确认已支付</button>
+							<button class="btn btn-outline-danger" type="button" v-on:click="showAppealPage(order)">申诉</button>
+						</div>
+						<div class="form-details-item" v-show="order.orderState == '8'">
+							<button class="btn btn-outline-info btn-lg" type="button" v-on:click="showAppealDetailsPage(order.id)">查看申诉详情</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="order-appeal-area" v-show="!showWaitConfirmOrderFlag">
+				<div class="form-details">
+					<div class="form-details-body">
+						<div class="form-details-item">
+							<label>订单号:</label> <span>{{selectedOrder.orderNo}}</span>
+						</div>
+						<div class="form-details-item" v-show="selectedOrder.attch != null && selectedOrder.attch != ''">
+							<label>会员id:</label> <span>{{selectedOrder.attch}}</span>
+						</div>
+						<div class="form-details-item">
+							<label>接单时间:</label> <span>{{selectedOrder.receivedTime}}</span>
+						</div>
+						<div class="form-details-item">
+							<label>收款通道:</label> <span>{{selectedOrder.gatheringChannelName}}</span><label>收款金额:</label> <span class="form-details-item-highlight">{{selectedOrder.gatheringAmount}}{{global.systemSetting.currencyUnit}}</span>
+						</div>
+					</div>
+				</div>
+				<div class="container" style="margin-top: 1.3rem;">
+					<form>
+						<div class="form-group">
+							<label>申诉类型:</label> <select class="form-control" v-model="appealType">
+								<option value="">请选择</option>
+								<option v-for="dictItem in appealTypeDictItems" :value="dictItem.dictItemCode" v-if="dictItem.dictItemCode == '1' || dictItem.dictItemCode == '2' || dictItem.dictItemCode == '4'">{{dictItem.dictItemName}}</option>
+							</select>
+						</div>
+						<div class="form-group" v-show="appealType == '2' || appealType == '4'">
+							<label>实际支付金额:</label> <input type="number" class="form-control" v-model="actualPayAmount">
+						</div>
+						<div class="form-group" v-show="appealType == '2' || appealType == '4'">
+							<label>截图:</label> <input type="file" class="form-control sreenshot" multiple>
+						</div>
+						<button type="button" class="btn btn-danger btn-lg btn-block" v-on:click="userStartAppeal">发起申诉</button>
+						<button type="button" class="btn btn-light btn-lg btn-block" v-on:click="showWaitConfirmOrderPage">返回</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div th:replace="common/footer::html"></div>
+	<link href="/css/common/theme-brown.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript" src="/js/audit-order.js"></script>
+</body>
+</html>

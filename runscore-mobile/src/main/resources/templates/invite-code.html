@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>我的邀请码</title>
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<script src="https://cdn.staticfile.org/layer/2.3/layer.js"></script>
+<script src="https://cdn.staticfile.org/clipboard.js/2.0.4/clipboard.min.js"></script>
+<script src="/js/common/common.js"></script>
+<link href="/css/common/common.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+</style>
+</head>
+
+<body>
+	<div th:replace="common/header::html"></div>
+	<div id="inviteCode" v-cloak>
+		<div class="page-body" style="background: #f2f2f2;">
+			<div class="input-group" style="padding-bottom: 0.3rem; padding-top: 0.3rem;">
+				<select class="form-control" style="width: 10rem; height: 3rem;" v-model="state">
+					<option value="">邀请码状态</option>
+					<option value="1">未使用</option>
+					<option value="2">已使用</option>
+					<option value="3">已失效</option>
+				</select>
+				<div class="input-group-append">
+					<button class="btn btn-outline-secondary" type="button" v-on:click="query">查询</button>
+				</div>
+			</div>
+			<div class="form-details" v-for="inviteCode in inviteCodes">
+				<div class="form-details-body">
+					<div class="form-details-item form-details-item-sm">
+						<label>账号类型:</label> <span>{{inviteCode.inviteCode.accountTypeName}}</span><label>邀请码:</label><span>{{inviteCode.inviteCode.code}}</span>
+					</div>
+					<div class="form-details-item form-details-item-sm">
+						<label>创建时间:</label> <span>{{inviteCode.inviteCode.createTime}}</span>
+					</div>
+					<div class="form-details-item form-details-item-sm">
+						<label>有效期:</label> <span>{{inviteCode.inviteCode.periodOfValidity}}</span><label class="form-details-item-highlight">{{inviteCode.inviteCode.used ? '已使用' : inviteCode.inviteCode.validFlag ? '未使用' : '已失效'}}</label>
+					</div>
+					<div class="form-details-item form-details-item-sm">
+						<template v-for="channel in inviteCode.inviteCodeChannelRebates"> <label>{{channel.channelName}}返点:</label> <span>{{channel.rebate}}</span> </template>
+					</div>
+					<div class="form-details-item" v-show="!inviteCode.inviteCode.used && inviteCode.inviteCode.validFlag">
+						<button class="btn btn-outline-info copy-invite-register-link-btn" type="button" v-on:click="" :data-clipboard-text="inviteCode.inviteCode.inviteRegisterLink">复制邀请链接</button>
+					</div>
+				</div>
+			</div>
+			<div style="padding-left: 13rem;">
+				<ul class="pagination">
+					<li class="page-item"><a class="page-link" v-show="totalPage > 0 && pageNum > 1" v-on:click="prePage">上一页</a></li>
+					<li class="page-item"><a class="page-link" v-show="pageNum >= 1 && pageNum < totalPage" v-on:click="nextPage">下一页</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div th:replace="common/footer::html"></div>
+	<link href="/css/common/theme-brown.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript">
+		var inviteCodeVM = new Vue({
+			el : '#inviteCode',
+			data : {
+				global : GLOBAL,
+				state : '',
+				inviteCodes : [],
+				pageNum : 1,
+				totalPage : 1,
+			},
+			computed : {},
+			created : function() {
+			},
+			mounted : function() {
+				headerVM.title = '我的邀请码';
+				headerVM.showBackFlag = true;
+				this.loadByPage();
+
+				var clipboard = new ClipboardJS('.copy-invite-register-link-btn');
+				clipboard.on('success', function(e) {
+					layer.alert('复制成功!', {
+						icon : 1,
+						time : 3000,
+						shade : false
+					});
+				});
+			},
+			methods : {
+
+				query : function() {
+					this.pageNum = 1;
+					this.loadByPage();
+				},
+
+				prePage : function() {
+					this.pageNum = this.pageNum - 1;
+					this.loadByPage();
+				},
+
+				nextPage : function() {
+					this.pageNum = this.pageNum + 1;
+					this.loadByPage();
+				},
+
+				loadByPage : function() {
+					var that = this;
+					that.$http.get('/agent/findInviteCodeByPage', {
+						params : {
+							pageSize : 5,
+							pageNum : that.pageNum,
+							state : that.state
+						}
+					}).then(function(res) {
+						that.inviteCodes = res.body.data.content;
+						that.pageNum = res.body.data.pageNum;
+						that.totalPage = res.body.data.totalPage;
+					});
+				}
+			}
+		});
+	</script>
+</body>
+</html>

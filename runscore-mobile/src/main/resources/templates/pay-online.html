@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="renderer" content="webkit">
+<title>收银台-在线支付</title>
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<script src="https://cdn.staticfile.org/layer/2.3/layer.js"></script>
+<link href="/css/payonline2/css/amazeui.min.css" rel="stylesheet" type="text/css">
+<link href="/css/payonline2/css/main.css" rel="stylesheet" type="text/css">
+<script src="/js/common/common.js"></script>
+</head>
+<body>
+<div id="pay-online">
+<div  class="pay">
+			<!--主内容开始编辑-->
+			<div class="tr_recharge">
+				<div class="tr_rechtext">
+					<p class="te_retit"><img src="/css/payonline2/images/coin.png" alt="" />收银台</p>
+					<p>平台名称：{{websiteTitle}}</p>
+					<p>商品名称： 在线支付</p>
+					<p>商户订单号：<span id="dd1"></span></p>
+					<input type="hidden" id="orderNo"/>
+				</div>
+				<form action="" class="am-form" id="doc-vld-msg">
+					<div class="tr_rechbox">
+
+						<div class="tr_rechli am-form-group">
+							<ul class="ui-choose am-form-group" id="uc_01">
+								<li v-bind:class="amount == '100' ? 'selected' : ''" v-on:click="loadQueryMoney('100')">
+									<label class="am-radio-inline">
+								        	<input type="radio"  name="docVlGender" > 100￥
+									    </label>
+								</li>
+								<li v-bind:class="amount == '200' ? 'selected' : ''" v-on:click="loadQueryMoney('200')">
+									<label class="am-radio-inline">
+									        <input type="radio" name="docVlGender" > 200￥
+								      	</label>
+								</li>
+
+								<li v-bind:class="amount == '500' ? 'selected' : ''" v-on:click="loadQueryMoney('500')">
+									<label class="am-radio-inline">
+									        <input type="radio" name="docVlGender" > 500￥
+								        </label>
+								</li>
+								<li v-bind:class="amount == '1000' ? 'selected' : ''" v-on:click="loadQueryMoney('1000')">
+									<label class="am-radio-inline">
+									        <input type="radio" name="docVlGender" > 1000￥
+								        </label>
+								</li>
+								<li v-bind:class="amount == '2000' ? 'selected' : ''" v-on:click="loadQueryMoney('2000')">
+									<label class="am-radio-inline">
+									        <input type="radio" name="docVlGender" > 2000￥
+								        </label>
+								</li>
+								<li v-bind:class="amount == 'money' ? 'selected' : ''" v-on:click="loadQueryMoney('money')">
+									<label class="am-radio-inline">
+									        <input type="radio" name="docVlGender" > 其他金额
+								        </label>
+								</li>
+							</ul>
+						</div>
+						<div class="tr_rechoth am-form-group">
+							<span>其他金额：</span>
+							<input type="number" id="amountId" min="1" max="100000"  class="othbox"  />
+						</div>
+						<div class="tr_rechcho am-form-group">
+							<span>支付方式：</span>
+							<label class="am-radio" style="margin-right:30px;margin-top: 15px;" v-for="(dictItem,index) in gatheringChannelDictItems">
+							     <input type="radio" name="radio1" :value="dictItem.channelCode" v-model='payType'>{{dictItem.channelName}}
+							</label>
+						</div>
+						<div class="tr_rechnum">
+							<span>商&nbsp;&nbsp;户&nbsp;&nbsp;&nbsp;账&nbsp;&nbsp;号：</span>
+							<p class="rechnum" style="    width: 50%;"><input type="text" v-model="merchantNum" placeholder="请输入 商户账号"/></p>
+						</div>
+						<div class="tr_rechnum">
+							<span>商&nbsp;&nbsp;户&nbsp;&nbsp;&nbsp;秘&nbsp;&nbsp;钥：</span>
+							<p class="rechnum" style="    width: 50%;"><input type="text" v-model="secretKey" placeholder="请输入商户密钥"/></p>
+						</div>
+						 <div class="tr_rechnum">
+							<span>异步通知地址：</span>
+							<p class="rechnum" style="    width: 50%;"><input type="text"  v-model="notifyUrl" placeholder="请输入异步通知地址，如果没有请随便输入" /></p>
+						</div>
+						<div class="tr_rechnum">
+							<span>同步通知地址：</span>
+							<p class="rechnum" style="    width: 50%;"><input type="text"  v-model="returnUrl" placeholder="请输入同步通知地址，如果没有请随便输入" /></p>
+						</div>
+					</div>
+					<div class="tr_paybox">
+						<input type="button" value="立即支付" v-on:click="submitPay" class="tr_pay am-btn" />
+						<span>温馨提示：匹配后，请于5分钟内付款，遇到问题请拨打联系电话。</span>
+					</div>
+				</form>
+			</div>
+		</div>
+</div>
+
+
+
+<script>
+   $(document).ready(function(){
+       var r = window.setInterval(function() {
+			var on = Math.round(new Date()) + "" + diu_Randomize(1000,10000);
+            $("#dd1").text(on);
+            $("#orderNo").val(on);
+       },
+       60000);
+   });
+   function diu_Randomize(b,e){
+	    return Math.floor( ( Math.random() * e ) + b );
+	}
+</script>
+		<script type="text/javascript" src="/css/payonline2/js/amazeui.min.js"></script>
+		<script type="text/javascript" src="/css/payonline2/js/ui-choose.js"></script>
+<script type="text/javascript">
+			// 将所有.ui-choose实例化
+			$('.ui-choose').ui_choose();
+			// uc_01 ul 单选
+			var uc_01 = $('#uc_01').data('ui-choose'); // 取回已实例化的对象
+
+			$(function() {
+				$('#doc-vld-msg').validator({
+					onValid: function(validity) {
+						$(validity.field).closest('.am-form-group').find('.am-alert').hide();
+					},
+					onInValid: function(validity) {
+						var $field = $(validity.field);
+						var $group = $field.closest('.am-form-group');
+						var $alert = $group.find('.am-alert');
+						// 使用自定义的提示信息 或 插件内置的提示信息
+						var msg = $field.data('validationMessage') || this.getValidationMessage(validity);
+
+						if(!$alert.length) {
+							$alert = $('<div class="am-alert am-alert-danger"></div>').hide().
+							appendTo($group);
+						}
+						$alert.html(msg).show();
+					}
+				});
+			});
+		</script>
+	<script type="text/javascript">
+		layer.load();
+		Vue.http.interceptors.push(function(request) {
+			return function(response) {
+				if (response.body.code != 200) {
+					response.ok = false;
+					layer.alert(response.body.msg, {
+						title : '提示',
+						icon : 7,
+						time : 3000
+					});
+					layer.closeAll('loading');
+				}
+			};
+		});
+
+		var payVM = new Vue({
+			el : '#pay-online',
+			data : {
+				global : GLOBAL,
+				websiteTitle : GLOBAL.systemSetting.websiteTitle,
+				amount : '100',
+				payType : '',
+				merchantNum : '',
+				secretKey : '',
+				orderNo : '',
+				notifyUrl : '',
+				returnUrl : '',
+				gatheringChannelDictItems : [],
+			},
+			computed : {},
+			created : function() {
+				this.loadGatheringChannelDictItem();
+			},
+			mounted(){
+		      if(localStorage.getItem("merchantNum")){
+		        try{
+		           this.merchantNum = localStorage.getItem("merchantNum");
+		        } catch(e){
+		           localStorage.removeItem('merchantNum');
+		        }
+		      }
+		      if(localStorage.getItem("secretKey")){
+		        try{
+		           this.secretKey = localStorage.getItem("secretKey");
+		        } catch(e){
+		           localStorage.removeItem('secretKey');
+		        }
+		      }
+		       if(localStorage.getItem("notifyUrl")){
+		        try{
+		           this.notifyUrl = localStorage.getItem("notifyUrl");
+		        } catch(e){
+		           localStorage.removeItem('notifyUrl');
+		        }
+		      }
+		      if(localStorage.getItem("returnUrl")){
+		        try{
+		           this.returnUrl = localStorage.getItem("returnUrl");
+		        } catch(e){
+		           localStorage.removeItem('returnUrl');
+		        }
+		      }
+		   },
+			methods : {
+				/**
+				 * 加载收款通道字典项
+				 */
+				loadGatheringChannelDictItem : function() {
+					var that = this;
+					that.$http.get('/gatheringChannel/findAllGatheringChannel').then(function(res) {
+						that.gatheringChannelDictItems = res.body.data;
+						var on = Math.round(new Date()) + "" + diu_Randomize(1000,10000);
+			            $("#dd1").text(on);
+			            $("#orderNo").val(on);
+						layer.closeAll('loading');
+					});
+				},
+				loadQueryMoney : function(amount) {
+					var that = this;
+					this.amount = amount;
+					if(amount == 'money'){
+						$('.tr_rechoth').show();
+					}else{
+						$('.tr_rechoth').hide();
+					}
+				},
+				submitPay : function() {
+
+					var that = this;
+					that.orderNo = $("#orderNo").val();
+					if (that.amount == null || that.queryMoney == '') {
+						layer.alert('请选择金额');
+						return;
+					}
+					if(that.amount == 'money'){
+						if($("#amountId").val() == '' || $("#amountId").val() == null){
+							layer.alert('请输入金额');
+							return;
+						}else{
+							that.amount = $("#amountId").val()
+						}
+					}
+					if (that.payType == null || that.payType == '') {
+						layer.alert('请选择支付方式');
+						return;
+					}
+					if (that.merchantNum == null || that.merchantNum == '') {
+						layer.alert('请输入商户账号');
+						return;
+					}
+					if (that.secretKey == null || that.secretKey == '') {
+						layer.alert('请输入商户秘钥');
+						return;
+					}
+					 if (that.notifyUrl == null || that.notifyUrl == '') {
+						layer.alert('请输入异步通知地址');
+						return;
+					}
+					if (that.returnUrl == null || that.returnUrl == '') {
+						layer.alert('请输入同步通知地址');
+						return;
+					}
+
+			        localStorage.setItem('merchantNum', this.merchantNum);
+			        localStorage.setItem('secretKey', this.secretKey);
+			        localStorage.setItem('notifyUrl', this.notifyUrl);
+			        localStorage.setItem('returnUrl', this.returnUrl);
+					layer.load();
+					 that.$http.post('/api/payOnline', {
+						amount : that.amount,
+						payType : that.payType,
+						merchantNum : that.merchantNum,
+						orderNo : that.orderNo,
+						returnUrl : that.returnUrl,
+						notifyUrl : that.notifyUrl,
+						secretKey : that.secretKey
+					}, {
+						emulateJSON : true
+					}).then(function(res) {
+						layer.closeAll('loading');
+						console.log(res)
+						if(res.body.code == 200){
+						   layer.alert('提交成功，正在跳转支付地址....');
+						   var t=setTimeout(window.open(res.body.data.payUrl,"_blank"),3000);
+						}else{
+							layer.alert('提交失败');
+						}
+					});
+				}
+			}
+		});
+	</script>
+
+</body>
+</html>

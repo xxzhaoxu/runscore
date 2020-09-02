@@ -1,0 +1,71 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<link href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<head>
+<style>
+.footer-navbar {
+	padding-top: 0.2rem;
+	padding-bottom: 0.5rem;
+	height: 3.8rem;
+}
+
+.footer-navbar-brand {
+	text-align: center;
+	color: #838793 !important;
+	padding-top: 0rem;
+	padding-bottom: 0rem;
+}
+
+.selected-footer-navbar-brand {
+	color: #37aafd !important;
+}
+
+.footer-navbar-brand span {
+	font-size: .8rem;
+}
+
+.footer-navbar-brand .fa {
+	display: block;
+	font-size: 2rem;
+}
+
+.footer-navbar img{
+	font-size: 2rem;
+	display: block;
+    width: 33px;
+    height: 33px;
+}
+.footer-navbar span{
+	color: #C0C8D0;
+}
+</style>
+</head>
+<body>
+	<div id="footer" style="background: #fff;" v-cloak>
+		<nav class="navbar fixed-bottom bg-light footer-navbar" v-show="showFooterFlag">
+			<a class="navbar-brand footer-navbar-brand" style="    font-size: 0.25rem;    margin-left: 10px;" v-show="global.systemSetting.showRankingListFlag" v-on:click="goTo('/ranking-list')" v-bind:class="{'selected-footer-navbar-brand': currentPathName == '/ranking-list'}"><img :src="currentPathName == '/ranking-list' ? 'images/paihangbang.png' : 'images/paihangbang1.png'" /> <span>排行榜</span> </a>
+			<a class="navbar-brand footer-navbar-brand" style="    font-size: 0.25rem;    margin-left: 10px;" v-on:click="goTo('/receive-order')" v-bind:class="{'selected-footer-navbar-brand': currentPathName == '/receive-order'}"><img :src="currentPathName == '/receive-order' ? 'images/jiedan2.png' : 'images/jiedan.png'"  /><span>接单</span></a>
+			<a class="navbar-brand footer-navbar-brand" style="    font-size: 0.25rem;    margin-left: 10px;" v-on:click="goTo('/audit-order')" v-bind:class="{'selected-footer-navbar-brand': currentPathName == '/audit-order'}"><img :src="currentPathName == '/audit-order' ? 'images/shenhe2.png' : 'images/shenhe.png'" /><span>审核</span></a>
+			<a class="navbar-brand footer-navbar-brand" style="    font-size: 0.25rem;    margin-left: 10px;" v-on:click="goTo('/my-home-page')" v-bind:class="{'selected-footer-navbar-brand': currentPathName == '/my-home-page'}"><img :src="currentPathName == '/my-home-page' ? 'images/wode2.png' : 'images/wode.png'"/><span>我的</span></a>
+		</nav>
+	</div>
+	<script type="text/javascript">
+		var footerVM = new Vue({
+			el : '#footer',
+			data : {
+				global : GLOBAL,
+				currentPathName : '',
+				showFooterFlag : true
+			},
+			computed : {},
+			created : function() {
+				this.currentPathName = window.location.pathname;
+			},
+			methods : {
+				goTo : function(url) {
+					window.location.href = url;
+				}
+			}
+		});
+	</script>
+</body>
+</html>

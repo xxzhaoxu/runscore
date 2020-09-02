@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="expires" content="0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="renderer" content="webkit">
+<title>支付</title>
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<script src="https://cdn.staticfile.org/layer/2.3/layer.js"></script>
+<script src="https://cdn.staticfile.org/dayjs/1.7.8/dayjs.min.js"></script>
+<script src="https://cdn.staticfile.org/clipboard.js/2.0.4/clipboard.min.js"></script>
+<link href="/css/pay.css" rel="stylesheet" type="text/css">
+<script src="/js/common/common.js"></script>
+</head>
+
+<body>
+	<div id="pay" class="container" v-cloak>
+		<div class="mainbody">
+			<div class="realprice">
+				￥<span>{{orderInfo.gatheringAmount}}</span>
+			</div>
+			<div class="effective-tip" v-show="orderInfo.gatheringChannelCode == 'bankCard' || orderInfo.gatheringChannelCode == 'alipayCard'">【银行卡仅本次有效】</div>
+			<div class="effective-tip" v-show="orderInfo.gatheringChannelCode == 'wechat'">【微信二维码仅本次有效】</div>
+			<div class="effective-tip" v-show="orderInfo.gatheringChannelCode == 'alipay'">【支付宝二维码仅本次有效】</div>
+			<div class="effective-tip" v-show="orderInfo.gatheringChannelCode == 'wechatMobile'">【微信手机转账仅本次有效】</div>
+			<div class="effective-tip">修改金额不到账，概不负责</div>
+			<!-- <div class="effective-tip">请截图扫码</div> -->
+			<div class="effective-tip" v-show="orderInfo.gatheringChannelCode != 'alipayIdXqd'">请截图保存到相册通过扫一扫进行扫码付款</div>
+			<div class="pay-success" v-show="paySuccessFlag">支付成功！</div>
+			<div class="qrcode" v-show="!paySuccessFlag">
+				<div v-if="!overdueFlag">
+					<div v-if="orderInfo.orderState == '1'">
+						<img class="image" src="images/pay/loading.gif" style="width: 200px; height: 200px;">
+					</div>
+					<div v-show="orderInfo.orderState == '2'">
+						<div class="gathering-way-info copy-text" v-if="orderInfo.gatheringChannelCode == 'bankCard' || orderInfo.gatheringChannelCode=='alipayCard'">
+							<div>开户银行:{{orderInfo.openAccountBank}}</div>
+							<div>开户人:{{orderInfo.accountHolder}}</div>
+							<div>卡号:{{orderInfo.bankCardAccount}}</div>
+							<button type="button" class="btn btn-success btn-block" :data-clipboard-text="orderInfo.openAccountBank">复制开户银行</button>
+							<button type="button" class="btn btn-success btn-block" :data-clipboard-text="orderInfo.accountHolder">复制开户人</button>
+							<button type="button" class="btn btn-success btn-block" :data-clipboard-text="orderInfo.bankCardAccount">复制卡号</button>
+						</div>
+						<div v-show="orderInfo.gatheringChannelCode == 'wechat' || orderInfo.gatheringChannelCode == 'alipay'  || orderInfo.gatheringChannelCode == 'ysf' || orderInfo.gatheringChannelCode=='alipayhb'">
+							<img class="image" :src="'/storage/fetch/' + orderInfo.gatheringCodeStorageId" style="width: 200px; height: 200px;">
+						</div>
+						<div v-show="orderInfo.gatheringChannelCode == 'alipayIdTransfer' || orderInfo.gatheringChannelCode == 'alipayIdXqd'  || orderInfo.gatheringChannelCode == 'alipayhb'">
+							<div v-show="!codeContentFlag">正在生成二维码...</div>
+							<div v-show="codeContentFlag">
+								<div id="qrcodeId" style="width: 200px; height: 200px;text-align: -webkit-center;padding-bottom: 15px;"></div>
+							</div>
+						</div>
+						<div class="gathering-way-info copy-text" style="padding-top: 2rem;" v-if="orderInfo.gatheringChannelCode == 'wechatMobile'">
+							<div>手机号:{{orderInfo.mobile}}</div>
+							<div>姓名:{{orderInfo.realName}}</div>
+							<button type="button" class="btn btn-success btn-block" :data-clipboard-text="orderInfo.mobile">复制手机号</button>
+							<button type="button" class="btn btn-success btn-block" :data-clipboard-text="orderInfo.realName">复制姓名</button>
+						</div>
+						<div class="gathering-way-info copy-text" style="padding-top: 2rem;" v-if="orderInfo.gatheringChannelCode == 'alipayTransfer'">
+							<div>账号:{{orderInfo.account}}</div>
+							<div>姓名:{{orderInfo.realName}}</div>
+							<button type="button" class="btn btn-success btn-block" :data-clipboard-text="orderInfo.account">复制账号</button>
+							<button type="button" class="btn btn-success btn-block" :data-clipboard-text="orderInfo.realName">复制姓名</button>
+						</div>
+					</div>
+				</div>
+				<img class="image" src="images/pay/overdue.png" style="width: 200px; height: 200px;" v-show="overdueFlag">
+			</div>
+
+			<div class="waiting-progress" v-show="!overdueFlag && orderInfo.orderState == '1'">
+				<div class="waiting-tip">
+					二维码加载中<span class="dot-ani"></span>
+				</div>
+				<div class="progress" style="height: 30px;">
+					<div class="progress-bar progress-bar-striped progress-bar-animated" v-bind:style="{width: ((globalResidueSecond - residueSecond) / globalResidueSecond * 100) + '%'}"></div>
+				</div>
+			</div>
+			<div class="remainseconds" v-if="orderInfo.orderState == '2' || orderInfo.orderState == '4'">
+				<span>[支付有效时间]</span> <span id="leftTime" style="color: red;">{{countdownMinute}}:{{countdownSecond}}</span>
+			</div>
+			<div class="scan-tip" v-if="orderInfo.orderState == '2' || orderInfo.orderState == '4'">
+				<div class="please-scan" v-show="orderInfo.gatheringChannelCode == 'bankCard'">请复制银行卡信息支付</div>
+				<div class="please-scan" v-show="orderInfo.gatheringChannelCode == 'wechat' || orderInfo.gatheringChannelCode == 'alipay'">请扫描二维码支付</div>
+				<div class="please-scan" v-show="orderInfo.gatheringChannelCode == 'wechatMobile'">请复制微信手机转账信息支付</div>
+				<div class="please-scan" v-show="orderInfo.gatheringChannelCode == 'alipayTransfer'">请复制支付宝账号信息进行转账</div>
+
+				<div class="pay-help">
+					<div id="qrcodeButton3" v-show="codeContentFlag && orderInfo.gatheringChannelCode == 'alipayIdXqd'" >
+						<button type="button" class="btn btn-info btn-block" style="font-size: large;"  v-on:click="zhifubaoXQD">启动支付宝支付</button>
+						 <div style="color:red;font-size: smaller;margin-bottom: 10px;">
+							1:支付宝启动后,请耐心等待支付页面加载完毕(约3-5秒)。<br/>
+							2:如遇拉起支付页面失败，已经安装以下任一APP，请点击对应的支付接口,或安装以下任一APP,然后点击支付即可
+						</div>
+						<button type="button" class="btn btn-info btn-block" v-on:click="zhifubaoEleme">启动饿了么跳转支付</button>
+						<button type="button" class="btn btn-info btn-block" v-on:click="zhifubaoKoubei">启动口碑跳转支付</button>
+						<button type="button" class="btn btn-info btn-block" v-on:click="zhifubaoFleamarket">启动闲鱼跳转支付</button>
+					</div>
+					<button type="button" id="qrcodeButton" class="btn btn-info btn-block" style="font-size: large;" v-show="codeContentFlag && orderInfo.gatheringChannelCode == 'alipayIdTransfer'" v-on:click="zhifubaoLQ">启动支付宝支付</button>
+					<button type="button" id="qrcodeButton" class="btn btn-info btn-block" style="font-size: large;" v-show="codeContentFlag && orderInfo.gatheringChannelCode == 'alipayCard'" v-on:click="zhifubaoCardLQ">启动支付宝(无需开飞)</button>
+					<button type="button" id="qrcodeButton2" class="btn btn-info btn-block" style="font-size: large;" v-show="!codeContentFlag && orderInfo.gatheringChannelCode == 'alipay'" v-on:click="zhifubao">启动支付宝支付</button>
+					<button type="button" class="btn btn-info btn-block" style="font-size: large;" v-show="orderInfo.gatheringChannelCode == 'wechat'" v-on:click="weixin">【微信】 A:长按识别二维码 B:保存二维码扫描</button>
+					<button type="button" class="btn btn-info btn-block" style="font-size: large;" v-show="orderInfo.gatheringChannelCode == 'alipay'" v-on:click="startScan">【支付宝】  A:保存二维码扫描 B:点击打开支付宝</button>
+					<div class="please-scan" v-show="orderInfo.gatheringChannelCode == 'wechatMobile'">请复制微信手机转账信息支付</div>
+					<div class="please-scan" v-show="orderInfo.gatheringChannelCode == 'alipayTransfer'">请复制支付宝账号信息进行转账</div>
+				</div>
+
+			</div>
+			<div class="help">
+				任何问题请联系客服<br> 订单号：<span>{{orderNo}}</span>
+			</div>
+			<div class="technical-support">{{payTechnicalSupport}}</div>
+		</div>
+	</div>
+	<input type="hidden" id="order"/>
+	<script src="https://cdn.staticfile.org/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+	<script type="text/javascript">
+		Vue.http.interceptors.push(function(request) {
+			return function(response) {
+				if (response.body.code != 200) {
+					response.ok = false;
+					layer.alert(response.body.msg, {
+						title : '提示',
+						icon : 7,
+						time : 3000
+					});
+				}
+			};
+		});
+
+		var payVM = new Vue({
+			el : '#pay',
+			data : {
+				global : GLOBAL,
+				orderNo : '',
+				payTechnicalSupport : '',
+				overdueFlag : false,
+				globalResidueSecond : '',
+				residueSecond : '',
+				countdownHour : '',
+				countdownMinute : '0',
+				countdownSecond : '00',
+				countdownInterval : null,
+				paySuccessFlag : false,
+				checkPaySuccessInterval : null,
+				homePageUrl : '',
+				codeContentFlag : false,
+				orderInfo : {},
+			},
+			computed : {},
+			created : function() {
+				var orderNo = getQueryString('orderNo');
+				if (orderNo == null || orderNo == '') {
+					layer.alert('无效的订单号', {
+						title : '提示',
+						icon : 7,
+						time : 3000
+					});
+					return;
+				}
+				this.orderNo = orderNo;
+				this.loadSystemSetting();
+				this.firstLoadGatheringCode();
+				new ClipboardJS('.copy-text button', {
+				    text: function(trigger) {
+				        return trigger.getAttribute('data-clipboard-text');
+				    }
+				}).on('success', function(e) {
+					layer.alert('复制成功!', {
+						icon : 1,
+						time : 3000,
+						shade : false
+					});
+				});
+
+
+			},
+			methods : {
+
+				loadSystemSetting : function() {
+					var that = this;
+					that.$http.get('/masterControl/getSystemSetting').then(function(res) {
+						that.payTechnicalSupport = res.body.data.payTechnicalSupport;
+					});
+					if(localStorage.getItem("homePageUrl")){
+				        try{
+				        	that.homePageUrl = localStorage.getItem("homePageUrl");
+				        } catch(e){
+				           localStorage.removeItem('homePageUrl');
+				        }
+				     }else{
+						that.$http.get('/dictconfig/findConfigValueInCache?configItemCode=homePageUrl').then(function(res) {
+							if (res.body.data != null) {
+								that.homePageUrl = res.body.data;
+								localStorage.setItem('homePageUrl', that.homePageUrl);
+							}
+						});
+				     }
+				},
+
+				firstLoadGatheringCode : function() {
+					var that = this;
+					console.log("orderNo: "+that.orderNo)
+					that.$http.get('/api/getOrderGatheringCode', {
+						params : {
+							orderNo : that.orderNo
+						}
+					}).then(function(res) {
+						console.log(res.body)
+						that.orderInfo = res.body.data;
+						if (that.orderInfo.orderState == '4') {
+							that.paySuccessFlag = true;
+							that.toReturnUrl();
+							return;
+						}
+						this.qrCode();
+						that.overdueFlag = !dayjs(that.orderInfo.usefulTime).isAfter(dayjs());
+						if (!that.overdueFlag) {
+							that.globalResidueSecond = dayjs(that.orderInfo.usefulTime).diff(dayjs(res.body.timestamp), 'second');
+							that.residueSecond = that.globalResidueSecond;
+							that.countdown();
+							if (that.orderInfo.orderState == '1') {
+								that.loadGatheringCode();
+							}
+						}
+					});
+				},
+
+				toReturnUrl : function() {
+					var that = this;
+					if (that.orderInfo.returnUrl == null || that.orderInfo.returnUrl == '') {
+						return;
+					}
+					setTimeout(function() {
+						window.location.href = that.orderInfo.returnUrl;
+					}, 3000);
+				},
+
+				loadGatheringCode : function() {
+					var that = this;
+					that.loadGatheringCodeInterval = window.setInterval(function() {
+						if (that.orderInfo.orderState == '2' || that.orderInfo.orderState == '4') {
+							if (that.loadGatheringCodeInterval != null) {
+								window.clearInterval(that.loadGatheringCodeInterval);
+								that.loadGatheringCodeInterval = null;
+							}
+							return;
+						}
+						that.loadGatheringCodeInner();
+					}, 3000);
+				},
+
+				loadGatheringCodeInner : function() {
+					var that = this;
+					that.$http.get('/api/getOrderGatheringCode', {
+						params : {
+							orderNo : that.orderNo
+						}
+					}).then(function(res) {
+						that.orderInfo = res.body.data;
+						if (that.orderInfo.orderState == '2' || that.orderInfo.orderState == '4') {
+							that.globalResidueSecond = dayjs(that.orderInfo.usefulTime).diff(dayjs(res.body.timestamp), 'second');
+							that.residueSecond = that.globalResidueSecond;
+							that.checkPaySuccess();
+						}
+					});
+				},
+
+				checkPaySuccess : function() {
+					var that = this;
+					that.checkPaySuccessInterval = window.setInterval(function() {
+						if (that.orderInfo.orderState == '4') {
+							that.paySuccessFlag = true;
+							if (that.checkPaySuccessInterval != null) {
+								window.clearInterval(that.checkPaySuccessInterval);
+								that.checkPaySuccessInterval = null;
+							}
+							if (that.countdownInterval != null) {
+								window.clearInterval(that.countdownInterval);
+								that.countdownInterval = null;
+							}
+							that.toReturnUrl();
+							return;
+						}
+						that.checkPaySuccessInner();
+					}, 3000);
+				},
+
+				checkPaySuccessInner : function() {
+					var that = this;
+					that.$http.get('/api/getOrderGatheringCode', {
+						params : {
+							orderNo : that.orderNo
+						}
+					}).then(function(res) {
+						that.orderInfo = res.body.data;
+						this.qrCode();
+					});
+				},
+
+				countdown : function() {
+					var that = this;
+					that.countdownInterval = window.setInterval(function() {
+						var residueSecond = that.residueSecond;
+						that.updateCountdownClock(residueSecond);
+						residueSecond--;
+						that.residueSecond = residueSecond;
+						if (residueSecond < 0) {
+							window.clearInterval(that.countdownInterval);
+							that.countdownInterval = null;
+							if (that.loadGatheringCodeInterval != null) {
+								window.clearInterval(that.loadGatheringCodeInterval);
+								that.loadGatheringCodeInterval = null;
+							}
+							that.overdueFlag = true;
+							$("#qrcodeId").hide();
+							$("#qrcodeButton").hide();
+							$("#qrcodeButton2").hide();
+							$("#qrcodeButton3").hide();
+						}
+					}, 1000);
+				},
+
+				/**
+				 * 更新倒计时
+				 */
+				updateCountdownClock : function(residueSecond) {
+					var that = this;
+					var countdownHour = 0;
+					var countdownMinute = 0;
+					var countdownSecond = 0;
+					if (residueSecond > 0) {
+						countdownHour = parseInt(residueSecond / (60 * 60) % 24);
+						countdownMinute = parseInt(residueSecond / 60 % 60);
+						countdownSecond = parseInt(residueSecond % 60);
+					}
+					if (countdownHour < 10) {
+						countdownHour = '0' + countdownHour;
+					}
+					if (countdownMinute < 10) {
+						countdownMinute = '0' + countdownMinute;
+					}
+					if (countdownSecond < 10) {
+						countdownSecond = '0' + countdownSecond;
+					}
+					that.countdownHour = countdownHour;
+					that.countdownMinute = countdownMinute;
+					that.countdownSecond = countdownSecond;
+				},
+				zhifubaoCardLQ : function() {
+					var that = this;
+					var qrcode = encodeURIComponent(that.homePageUrl+"/payzfbcard?orNo="+this.orderNo);
+					var url = 'alipays://platformapi/startapp?appId=60000029&showLoading=YES&url=' + qrcode;
+					window.location = url;
+				},
+				zhifubaoLQ : function() {
+					var that = this;
+					var gatheringAmount = that.orderInfo.gatheringAmount;
+					var alipayUserid = that.orderInfo.alipayUserid;
+					var qrcode = encodeURIComponent(that.homePageUrl+"/paycheck?money="+gatheringAmount+"&userId="+alipayUserid+"&memo="+this.orderNo);
+					var url = 'alipays://platformapi/startapp?appId=10000007&qrcode=' + qrcode;
+					window.location = url;
+				},
+				zhifubaoXQD : function() {
+					var that = this;
+					var gatheringAmount = that.orderInfo.gatheringAmount;
+					var alipayUserid = that.orderInfo.alipayUserid;
+					var qrcode = encodeURIComponent("pages/transfer/transfer?amount="+gatheringAmount+"&chInfo=moneyBox&frontBizNo="+this.orderNo+"&remark="+this.orderNo+"&uid="+alipayUserid);
+					var url = 'alipays://platformapi/startapp?appId=2018100961599704&page='+qrcode;
+					window.location = url;
+				},
+				zhifubaoEleme : function() {
+					var that = this;
+					var gatheringAmount = that.orderInfo.gatheringAmount;
+					var alipayUserid = that.orderInfo.alipayUserid;
+					var qrcode = encodeURIComponent("pages/transfer/transfer?amount="+gatheringAmount+"&chInfo=moneyBox&frontBizNo="+this.orderNo+"&remark="+this.orderNo+"&uid="+alipayUserid);
+					var qrcode2 = encodeURIComponent("alipays://platformapi/startapp?appId=2018100961599704&page="+qrcode);
+					var qrcode3 = encodeURIComponent("https://ds.alipay.com/?from=mobilecodec&scheme="+qrcode2);
+					var url = 'eleme://web_overlay?url='+qrcode3;
+					window.location = url;
+				},
+				zhifubaoKoubei : function() {
+					var that = this;
+					var gatheringAmount = that.orderInfo.gatheringAmount;
+					var alipayUserid = that.orderInfo.alipayUserid;
+					var qrcode = encodeURIComponent("pages/transfer/transfer?amount="+gatheringAmount+"&chInfo=moneyBox&frontBizNo="+this.orderNo+"&remark="+this.orderNo+"&uid="+alipayUserid);
+					var qrcode2 = encodeURIComponent("alipays://platformapi/startapp?appId=2018100961599704&page="+qrcode);
+					var qrcode3 = encodeURIComponent("https://ds.alipay.com/?from=mobilecodec&scheme="+qrcode2);
+					var url = 'koubei://platformapi/startapp?appId=68687256&url='+qrcode3;
+					window.location = url;
+				},
+				zhifubaoFleamarket : function() {
+					var that = this;
+					var gatheringAmount = that.orderInfo.gatheringAmount;
+					var alipayUserid = that.orderInfo.alipayUserid;
+					var qrcode = encodeURIComponent("pages/transfer/transfer?amount="+gatheringAmount+"&chInfo=moneyBox&frontBizNo="+this.orderNo+"&remark="+this.orderNo+"&uid="+alipayUserid);
+					var qrcode2 = encodeURIComponent("alipays://platformapi/startapp?appId=2018100961599704&page="+qrcode);
+					var qrcode3 = encodeURIComponent("https://ds.alipay.com/?from=mobilecodec&scheme="+qrcode2);
+					var url = 'fleamarket://home?_from__=qrcapture&forward_url='+qrcode3;
+					window.location = url;
+				},
+				zhifubao : function() {
+					var that = this;
+					var codeContent = that.orderInfo.codeContent;
+					if(codeContent != null && codeContent != ''){
+						var qrcode = encodeURIComponent(codeContent);
+						var url = 'alipays://platformapi/startapp?appId=10000007&qrcode=' + qrcode;
+						window.location = url;
+					}
+				},
+				qrCode : function() {
+					if(this.overdueFlag){
+						return;
+					}
+					if($("#order").val() == "1"){
+						return;
+					}
+					var that = this;
+					if (that.orderInfo.orderState == '2') {
+						var alipayUserid = that.orderInfo.alipayUserid;
+						var gatheringChannelCode = that.orderInfo.gatheringChannelCode;
+						if(gatheringChannelCode == 'alipayIdTransfer'){
+							that.codeContentFlag = true;
+							$("#order").val("1");
+							var gatheringAmount = that.orderInfo.gatheringAmount;
+							var qrcode = encodeURIComponent(that.homePageUrl+"/paycheck?money="+gatheringAmount+"&userId="+alipayUserid+"&memo="+this.orderNo);
+							var url = 'alipays://platformapi/startapp?appId=10000007&qrcode=' + qrcode;
+							var id = document.getElementById("qrcodeId");
+							that.$nextTick(() => {
+								jQuery('#qrcodeId').qrcode({
+									width : 200,
+									height : 200,
+									text : url
+								});
+				            });
+							/* setTimeout(function() {
+								that.zhifubaoLQ();
+							}, 3000); */
+						} else if(gatheringChannelCode == 'alipayIdXqd'){
+							that.codeContentFlag = true;
+							$("#order").val("1");
+							var gatheringAmount = that.orderInfo.gatheringAmount;
+							var qrcodes = encodeURIComponent("pages/transfer/transfer?amount="+gatheringAmount+"&chInfo=moneyBox&frontBizNo="+this.orderNo+"&remark="+this.orderNo+"&uid="+alipayUserid);
+							var urls = 'alipays://platformapi/startapp?appId=2018100961599704&page='+qrcodes;
+							that.$nextTick(() => {
+								jQuery('#qrcodeId').qrcode({
+									width : 200,
+									height : 200,
+									text : urls
+								});
+				            });
+						} else if(gatheringChannelCode == 'alipayCard'){
+							that.codeContentFlag = true;
+							$("#order").val("1");
+							var qrcode = encodeURIComponent(that.homePageUrl+"/payzfbcard?orNo="+this.orderNo);
+							var url = 'alipays://platformapi/startapp?appId=60000029&showLoading=YES&url=' + qrcode;
+							that.$nextTick(() => {
+								jQuery('#qrcodeId').qrcode({
+									width : 200,
+									height : 200,
+									text : url
+								});
+				            });
+						}
+					}
+				},
+				startScan : function() {
+					var url = 'alipays://platformapi/startapp?appId=10000007';
+					window.location = url;
+				},
+				weixin : function() {
+					var url = 'weixin://';
+					window.location = url;
+				}
+			}
+		});
+	</script>
+
+</body>
+</html>

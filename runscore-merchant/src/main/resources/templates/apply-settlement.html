@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<title>申请结算</title>
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<script src="https://cdn.staticfile.org/dayjs/1.7.8/dayjs.min.js"></script>
+<link rel="stylesheet" href="https://cdn.staticfile.org/bootstrap-table/1.13.1/bootstrap-table.min.css">
+<script src="https://cdn.staticfile.org/bootstrap-table/1.13.1/bootstrap-table.min.js"></script>
+<script src="https://cdn.staticfile.org/bootstrap-table/1.13.1/locale/bootstrap-table-zh-CN.min.js"></script>
+<link href="/css/common/common.css" rel="stylesheet" type="text/css">
+<script src="/js/common/common.js"></script>
+<style type="text/css">
+.apply-settlement-item {
+	font-size: 18px;
+	padding-bottom: 28px;
+}
+
+.apply-settlement-item-label {
+	text-align: right;
+	padding-right: 20px;
+	color: #757b82;
+}
+
+.apply-settlement-item-value {
+	color: #212529;
+}
+
+.withdrawable-amount .apply-settlement-item-label, .withdrawable-amount .apply-settlement-item-value
+	{
+	color: red;
+}
+
+.apply-settlement-item-value input, .apply-settlement-item-value select
+	{
+	width: 80%;
+}
+</style>
+</head>
+
+<body>
+	<div th:replace="common/header::html"></div>
+	<div id="apply-settlement" v-cloak>
+		<ul class="nav common-tab">
+			<li class="nav-item" v-bind:class="{'selected-tab-item': selectedTab == 'applySettlement'}" v-on:click="selectedTab = 'applySettlement'"><a class="nav-link">申请结算</a></li>
+			<li class="nav-item" v-bind:class="{'selected-tab-item': selectedTab == 'settlementRecord'}" v-on:click="selectedTab = 'settlementRecord'"><a class="nav-link">我的结算记录</a></li>
+		</ul>
+		<div class="card" v-show="selectedTab == 'applySettlement'">
+			<div class="card-body">
+				<div class="row apply-settlement-item withdrawable-amount">
+					<div class="col-sm-4 apply-settlement-item-label">可提现:</div>
+					<div class="col-sm-6 apply-settlement-item-value">{{withdrawableAmount}}{{global.systemSetting.currencyUnit}}</div>
+				</div>
+				<div class="row apply-settlement-item">
+					<div class="col-sm-4 apply-settlement-item-label">提现金额:</div>
+					<div class="col-sm-6 apply-settlement-item-value">
+						<input type="number" class="form-control" placeholder="提现金额" v-model="withdrawAmount">
+					</div>
+				</div>
+				<div class="row apply-settlement-item">
+					<div class="col-sm-4 apply-settlement-item-label">结算银行卡:</div>
+					<div class="col-sm-6 apply-settlement-item-value">
+						<select class="form-control" v-model="merchantBankCardId">
+							<option value="">请选择</option>
+							<option v-for="dictItem in merchantBankCards" :value="dictItem.id">{{dictItem.openAccountBank + '/' + dictItem.accountHolder + '/' + dictItem.bankCardAccount}}</option>
+						</select>
+					</div>
+				</div>
+				<div class="row apply-settlement-item">
+					<div class="col-sm-4 apply-settlement-item-label">资金密码:</div>
+					<div class="col-sm-6 apply-settlement-item-value">
+						<input type="password" class="form-control" placeholder="资金密码" v-model="moneyPwd">
+					</div>
+				</div>
+				<div class="row apply-settlement-item">
+					<div class="offset-md-4">
+						<button type="button" class="btn btn-outline-primary" v-on:click="applySettlement">提交申请</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="card" v-show="selectedTab == 'settlementRecord'">
+			<div class="card-body">
+				<form class="form-inline common-query-cond-form">
+					<div class="form-group common-query-cond">
+						<label>申请时间:</label><input type="date" class="form-control-sm" v-model="applyStartTime"><span>到</span><input type="date" class="form-control-sm" v-model="applyEndTime">
+					</div>
+					<button type="button" class="btn btn-danger btn-sm" v-on:click="refreshTable">搜索</button>
+				</form>
+				<table class="common-table settlement-record-table"></table>
+			</div>
+		</div>
+	</div>
+	<script src="/js/apply-settlement.js"></script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>登录</title>
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<link href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<script src="https://cdn.staticfile.org/layer/2.3/layer.js"></script>
+<link href="/css/common/common.css" rel="stylesheet" type="text/css">
+<script src="/js/common/common.js"></script>
+<link href="/css/base.css" type="text/css" rel="stylesheet"/>
+<link href="/css/style.css" type="text/css" rel="stylesheet"/>
+
+</head>
+
+<body>
+	<div th:replace="common/header::html"></div>
+	<div id="login" v-cloak>
+	<div class="wrp-auto" >
+			<div class="header-info">
+				<a href="#" class="fl"></a>
+				<a href="#" class="fr reg"  v-on:click="window.location.href = '/register'">注册</a>
+				<div class="clearfix"></div>
+			</div>
+			<div class="login-box">
+				<h3>登录</h3>
+				<p>欢迎使用{{websiteTitle}}</p>
+				<form>
+					<div class="login-input">
+						<input type="text"  placeholder="请输入账号" v-model="userName"/>
+						<input type="password"  placeholder="请输入密码" v-model="password"/>
+						<template v-if="mobileLoginGoogleAuth">
+							<div class="form-group">
+								<input type="text" placeholder="如未绑定谷歌安全密钥，此处留空" v-model="googleVerCode" >
+							</div>
+						</template>
+					</div>
+					<div class="wj-pwd">
+						<input type="checkbox" v-model="rememberMe" /><span>记住密码</span>
+					</div>
+					<div class="login-btn" v-on:click="login">
+						<a href="#">登录</a>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- <div class="page-body">
+			<div class="website-title">{{websiteTitle}}</div>
+			<div class="container login-container">
+				<form>
+					<div class="input-group input-group-lg mb-4">
+						<div class="input-group-prepend">
+							<span class="input-group-text"><i class="fa fa-user-circle-o" aria-hidden="true"></i></span>
+						</div>
+						<input type="text" class="form-control" placeholder="请输入用户名" v-model="userName">
+					</div>
+					<template v-if="memberMeEnabled">
+					<div class="input-group input-group-lg mb-4" style="margin-bottom: 0.5rem !important;">
+						<div class="input-group-prepend">
+							<span class="input-group-text"><i class="fa fa-key" aria-hidden="true"></i></span>
+						</div>
+						<input type="password" class="form-control" placeholder="请输入登录密码" v-model="password">
+					</div>
+					<div class="custom-control custom-checkbox" style="padding-bottom: 1rem;">
+						<input type="checkbox" class="custom-control-input" id="rememberMe" v-model="rememberMe"> <label class="custom-control-label" for="rememberMe">记住密码</label>
+					</div>
+					</template>
+					<template v-if="!memberMeEnabled">
+					<div class="input-group input-group-lg mb-4">
+						<div class="input-group-prepend">
+							<span class="input-group-text"><i class="fa fa-key" aria-hidden="true"></i></span>
+						</div>
+						<input type="password" class="form-control" placeholder="请输入登录密码" v-model="password">
+					</div>
+					</template>
+					<button type="button" class="btn btn-danger btn-lg btn-block login-btn" v-on:click="login">立即登录</button>
+					<button type="button" class="btn btn-light btn-lg btn-block" v-show="registerEnabled" v-on:click="footerVM.goTo('/register')">注册</button>
+				</form>
+			</div>
+		</div> -->
+
+	</div>
+	<div th:replace="common/footer-new::html"></div>
+	<link href="/css/common/theme-brown.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript">
+		var loginVM = new Vue({
+			el : '#login',
+			data : {
+				websiteTitle : '',
+				memberMeEnabled : false,
+				registerEnabled : false,
+				userName : '',
+				password : '',
+				googleVerCode : '',
+				mobileLoginGoogleAuth : false,
+				rememberMe : false
+			},
+			computed : {},
+			created : function() {
+			},
+			mounted : function() {
+				headerVM.title = '登录';
+				headerVM.showHeaderFlag = false;
+				this.loadSystemSetting();
+				this.loadRegisterSetting();
+			},
+			methods : {
+
+				loadSystemSetting : function() {
+					var that = this;
+					that.$http.get('/masterControl/getSystemSetting').then(function(res) {
+						that.websiteTitle = res.body.data.websiteTitle;
+						that.memberMeEnabled = res.body.data.memberMeEnabled;
+						that.mobileLoginGoogleAuth = res.body.data.mobileLoginGoogleAuth;
+					});
+				},
+
+				loadRegisterSetting : function() {
+					var that = this;
+					that.$http.get('/masterControl/getRegisterSetting').then(function(res) {
+						that.registerEnabled = res.body.data.registerEnabled;
+					});
+				},
+
+				login : function() {
+					var that = this;
+					if (that.userName == null || that.userName == '') {
+						layer.alert('请输入用户名');
+						return;
+					}
+					if (that.password == null || that.password == '') {
+						layer.alert('请输入密码');
+						return;
+					}
+					that.$http.post('/login', {
+						username : that.userName,
+						password : that.password,
+						googleVerCode : that.googleVerCode,
+						rememberMe : !that.memberMeEnabled ? false : that.rememberMe
+					}, {
+						emulateJSON : true
+					}).then(function(res) {
+						window.location.href = '/my-home-page';
+					});
+				}
+			}
+		});
+	</script>
+</body>
+</html>
