@@ -123,7 +123,8 @@ var gatheringCodeVM = new Vue({
 							}else{
 								return '收款人:' + row.payee;
 							}*/
-							return '收款人:' + row.payee;
+							console.log('<p>收款人:' + row.payee+'</p>' + '<p>支付宝id:' + row.alipayUserid + '</p>')
+							return '<p>收款人:' + row.payee+'</p>' + '<p>支付宝账号:' + row.account + '</p>';
 						} else if (row.gatheringChannelCode == 'wechatMobile') {
 							return '手机号/姓名:' + row.mobile + '/' + row.realName;
 						} else if (row.gatheringChannelCode == 'alipayIdTransfer' || row.gatheringChannelCode == 'alipayIdXqd') {
