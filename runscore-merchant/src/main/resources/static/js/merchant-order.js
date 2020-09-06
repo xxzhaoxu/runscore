@@ -14,7 +14,7 @@ var merchantOrderVM = new Vue({
 		payNoticeState : '',
 		payNoticeStateDictItems : [],
 		showMerchantRecordFlag : true,
-
+		merchantOrderNo :'',
 		defaultNofityUrl : '',
 		defaultReturnUrl : '',
 		showAddOrderFlag : false,
@@ -137,6 +137,7 @@ var merchantOrderVM = new Vue({
 						pageSize : params.pageSize,
 						pageNum : params.pageNumber,
 						orderNo : that.orderNo,
+						merchantOrderNo : that.merchantOrderNo,
 						platformName : that.platformName,
 						orderState : that.orderState,
 						gatheringChannelCode : that.gatheringChannelCode,
