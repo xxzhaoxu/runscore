@@ -153,6 +153,9 @@
 					<div class="form-group" v-show="selectedGatheringChannel.channelCode == 'alipayIdTransfer' || selectedGatheringChannel.channelCode == 'alipayTransfer'  || selectedGatheringChannel.channelCode == 'wechatMobile' || selectedGatheringChannel.channelCode == 'alipayIdXqd' || selectedGatheringChannel.channelCode=='alipayhb'">
 						<label>收款人:</label> <input type="text" class="form-control" v-model="editGatheringCode.payee" placeholder="此处必须是收款码的昵称">
 					</div>
+					<div class="form-group"  v-show=" selectedGatheringChannel.channelCode=='alipayhb'">
+						<label>群昵称:</label> <input type="text" class="form-control" v-model="editGatheringCode.groupNickName" placeholder="此处必须是群收款的昵称">
+					</div>
 					<div class="form-group" v-show="!unfixedGatheringCodeReceiveOrder">
 						<label> 收款金额: </label> <input type="number" class="form-control" v-model="editGatheringCode.gatheringAmount">
 					</div>

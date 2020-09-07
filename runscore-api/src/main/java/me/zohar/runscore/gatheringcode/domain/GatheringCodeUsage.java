@@ -149,4 +149,6 @@ public class GatheringCodeUsage implements Serializable {
 
 	private Double todaySuccessRate;
 
+	private String groupNickName;
+
 }

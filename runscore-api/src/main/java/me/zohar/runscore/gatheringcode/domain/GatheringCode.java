@@ -117,6 +117,9 @@ public class GatheringCode implements Serializable {
 
 	private String account;
 
+
+	private String groupNickName;
+
 	@Column(name = "storage_id", length = 32)
 	private String storageId;
 

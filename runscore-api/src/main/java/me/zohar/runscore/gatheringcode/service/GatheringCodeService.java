@@ -196,8 +196,7 @@ public class GatheringCodeService {
 				return predicates.size() > 0 ? builder.and(predicates.toArray(new Predicate[predicates.size()])) : null;
 			}
 		};
-		Page<GatheringCodeUsage> result = gatheringCodeUsageRepo.findAll(spec,
-				PageRequest.of(param.getPageNum() - 1, param.getPageSize(), Sort.by(Sort.Order.desc("createTime"))));
+		Page<GatheringCodeUsage> result = gatheringCodeUsageRepo.findAll(spec, PageRequest.of(param.getPageNum() - 1, param.getPageSize(), Sort.by(Sort.Order.desc("createTime"))));
 		PageResult<GatheringCodeUsageVO> pageResult = new PageResult<>(
 				GatheringCodeUsageVO.convertFor(result.getContent()), param.getPageNum(), param.getPageSize(),
 				result.getTotalElements());

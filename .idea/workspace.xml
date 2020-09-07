@@ -24,20 +24,28 @@
   <component name="ChangeListManager">
     <list default="true" id="8df44714-526d-49c0-9ae6-239ca479a461" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runscore-admin/runscore-admin.iml" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-admin/runscore-admin.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/runscore-admin/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-admin/src/main/resources/application.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/runscore-admin/src/main/resources/static/js/gathering-code.js" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-admin/src/main/resources/static/js/gathering-code.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runscore-api/runscore-api.iml" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/runscore-api.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runscore-api/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/target/maven-archiver/pom.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runscore-api/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runscore-api/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runscore-api/target/runscore-api-0.0.1-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/target/runscore-api-0.0.1-SNAPSHOT.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runscore-merchant/runscore-merchant.iml" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-merchant/runscore-merchant.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runscore-api/src/main/java/me/zohar/runscore/gatheringcode/domain/GatheringCode.java" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/src/main/java/me/zohar/runscore/gatheringcode/domain/GatheringCode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runscore-api/src/main/java/me/zohar/runscore/gatheringcode/domain/GatheringCodeUsage.java" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/src/main/java/me/zohar/runscore/gatheringcode/domain/GatheringCodeUsage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runscore-api/src/main/java/me/zohar/runscore/gatheringcode/param/GatheringCodeParam.java" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/src/main/java/me/zohar/runscore/gatheringcode/param/GatheringCodeParam.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runscore-api/src/main/java/me/zohar/runscore/gatheringcode/service/GatheringCodeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/src/main/java/me/zohar/runscore/gatheringcode/service/GatheringCodeService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runscore-api/src/main/java/me/zohar/runscore/gatheringcode/vo/GatheringCodeUsageVO.java" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/src/main/java/me/zohar/runscore/gatheringcode/vo/GatheringCodeUsageVO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runscore-api/src/main/java/me/zohar/runscore/merchant/service/MerchantOrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/src/main/java/me/zohar/runscore/merchant/service/MerchantOrderService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runscore-api/src/main/java/me/zohar/runscore/merchant/vo/OrderGatheringCodeVO.java" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/src/main/java/me/zohar/runscore/merchant/vo/OrderGatheringCodeVO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runscore-api/src/main/java/me/zohar/runscore/rechargewithdraw/param/RechargeOrderParam.java" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/src/main/java/me/zohar/runscore/rechargewithdraw/param/RechargeOrderParam.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runscore-api/target/classes/me/zohar/runscore/gatheringcode/domain/GatheringCode.class" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/target/classes/me/zohar/runscore/gatheringcode/domain/GatheringCode.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runscore-api/target/classes/me/zohar/runscore/gatheringcode/param/GatheringCodeParam.class" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/target/classes/me/zohar/runscore/gatheringcode/param/GatheringCodeParam.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runscore-api/target/classes/me/zohar/runscore/gatheringcode/service/GatheringCodeService$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/target/classes/me/zohar/runscore/gatheringcode/service/GatheringCodeService$2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runscore-api/target/classes/me/zohar/runscore/gatheringcode/service/GatheringCodeService.class" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/target/classes/me/zohar/runscore/gatheringcode/service/GatheringCodeService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runscore-api/target/classes/me/zohar/runscore/merchant/service/MerchantOrderService$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/target/classes/me/zohar/runscore/merchant/service/MerchantOrderService$2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runscore-api/target/classes/me/zohar/runscore/merchant/service/MerchantOrderService$3.class" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/target/classes/me/zohar/runscore/merchant/service/MerchantOrderService$3.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runscore-api/target/classes/me/zohar/runscore/merchant/service/MerchantOrderService.class" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/target/classes/me/zohar/runscore/merchant/service/MerchantOrderService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runscore-api/target/classes/me/zohar/runscore/merchant/vo/OrderGatheringCodeVO.class" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-api/target/classes/me/zohar/runscore/merchant/vo/OrderGatheringCodeVO.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/runscore-merchant/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-merchant/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runscore-merchant/src/main/resources/static/js/merchant-order.js" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-merchant/src/main/resources/static/js/merchant-order.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runscore-merchant/src/main/resources/templates/merchant-order.html" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-merchant/src/main/resources/templates/merchant-order.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runscore-mobile/runscore-mobile.iml" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-mobile/runscore-mobile.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/runscore-mobile/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-mobile/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runscore-mobile/src/main/resources/static/js/gathering-code.js" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-mobile/src/main/resources/static/js/gathering-code.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runscore-mobile/src/main/resources/templates/gathering-code.html" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-mobile/src/main/resources/templates/gathering-code.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/runscore-mobile/src/main/resources/templates/pay.html" beforeDir="false" afterPath="$PROJECT_DIR$/runscore-mobile/src/main/resources/templates/pay.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -93,7 +101,7 @@
   <component name="ReactorSettings">
     <option name="notificationShown" value="true" />
   </component>
-  <component name="RunManager" selected="Spring Boot.MobileApplication">
+  <component name="RunManager" selected="Spring Boot.AdminApplication">
     <configuration name="MerchantApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="me.zohar.MerchantApplication" />
       <module name="runscore-merchant" />
@@ -120,15 +128,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
+    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
           <option name="containerStateName" value="" />
         </value>
       </option>
-      <option name="TEST_OBJECT" value="CLASS" />
-      <properties />
-      <listeners />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -182,7 +188,8 @@
       <workItem from="1598920660291" duration="2277000" />
       <workItem from="1599011581037" duration="567000" />
       <workItem from="1599059660408" duration="11189000" />
-      <workItem from="1599295584874" duration="11902000" />
+      <workItem from="1599295584874" duration="12242000" />
+      <workItem from="1599486259960" duration="11334000" />
     </task>
     <servers />
   </component>
@@ -202,78 +209,82 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="694" y="343" key="#Notifications" timestamp="1599492496406">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="694" y="343" key="#Notifications/0.0.1920.1040@0.0.1920.1040" timestamp="1599492496406" />
     <state x="440" y="94" key="#Project_Structure" timestamp="1599059722893">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="440" y="94" key="#Project_Structure/0.0.1920.1040@0.0.1920.1040" timestamp="1599059722893" />
-    <state width="442" height="466" key="DebuggerActiveHint" timestamp="1599310411945">
+    <state width="442" height="466" key="DebuggerActiveHint" timestamp="1599497010572">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="442" height="466" key="DebuggerActiveHint/0.0.1920.1040@0.0.1920.1040" timestamp="1599310411945" />
-    <state width="1877" height="173" key="GridCell.Tab.0.bottom" timestamp="1599403659593">
+    <state width="442" height="466" key="DebuggerActiveHint/0.0.1920.1040@0.0.1920.1040" timestamp="1599497010572" />
+    <state width="1877" height="192" key="GridCell.Tab.0.bottom" timestamp="1599496940662">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="173" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1599403659593" />
-    <state width="1877" height="173" key="GridCell.Tab.0.center" timestamp="1599403659592">
+    <state width="1877" height="192" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1599496940662" />
+    <state width="1877" height="192" key="GridCell.Tab.0.center" timestamp="1599496940662">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="173" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1599403659592" />
-    <state width="1877" height="173" key="GridCell.Tab.0.left" timestamp="1599403659592">
+    <state width="1877" height="192" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1599496940662" />
+    <state width="1877" height="192" key="GridCell.Tab.0.left" timestamp="1599496940662">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="173" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1599403659592" />
-    <state width="1877" height="173" key="GridCell.Tab.0.right" timestamp="1599403659592">
+    <state width="1877" height="192" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1599496940662" />
+    <state width="1877" height="192" key="GridCell.Tab.0.right" timestamp="1599496940662">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="173" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1599403659592" />
-    <state width="1877" height="173" key="GridCell.Tab.1.bottom" timestamp="1599403659593">
+    <state width="1877" height="192" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1599496940662" />
+    <state width="1877" height="192" key="GridCell.Tab.1.bottom" timestamp="1599496980971">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="173" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1599403659593" />
-    <state width="1877" height="173" key="GridCell.Tab.1.center" timestamp="1599403659593">
+    <state width="1877" height="192" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1599496980971" />
+    <state width="1877" height="192" key="GridCell.Tab.1.center" timestamp="1599496980971">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="173" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1599403659593" />
-    <state width="1877" height="173" key="GridCell.Tab.1.left" timestamp="1599403659593">
+    <state width="1877" height="192" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1599496980971" />
+    <state width="1877" height="192" key="GridCell.Tab.1.left" timestamp="1599496980971">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="173" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1599403659593" />
-    <state width="1877" height="173" key="GridCell.Tab.1.right" timestamp="1599403659593">
+    <state width="1877" height="192" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1599496980971" />
+    <state width="1877" height="192" key="GridCell.Tab.1.right" timestamp="1599496980971">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="173" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1599403659593" />
-    <state width="1877" height="173" key="GridCell.Tab.2.bottom" timestamp="1599403659593">
+    <state width="1877" height="192" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1599496980971" />
+    <state width="1877" height="192" key="GridCell.Tab.2.bottom" timestamp="1599496940482">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="173" key="GridCell.Tab.2.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1599403659593" />
-    <state width="1877" height="173" key="GridCell.Tab.2.center" timestamp="1599403659593">
+    <state width="1877" height="192" key="GridCell.Tab.2.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1599496940482" />
+    <state width="1877" height="192" key="GridCell.Tab.2.center" timestamp="1599496940482">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="173" key="GridCell.Tab.2.center/0.0.1920.1040@0.0.1920.1040" timestamp="1599403659593" />
-    <state width="1877" height="173" key="GridCell.Tab.2.left" timestamp="1599403659593">
+    <state width="1877" height="192" key="GridCell.Tab.2.center/0.0.1920.1040@0.0.1920.1040" timestamp="1599496940482" />
+    <state width="1877" height="192" key="GridCell.Tab.2.left" timestamp="1599496940482">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="173" key="GridCell.Tab.2.left/0.0.1920.1040@0.0.1920.1040" timestamp="1599403659593" />
-    <state width="1877" height="173" key="GridCell.Tab.2.right" timestamp="1599403659593">
+    <state width="1877" height="192" key="GridCell.Tab.2.left/0.0.1920.1040@0.0.1920.1040" timestamp="1599496940482" />
+    <state width="1877" height="192" key="GridCell.Tab.2.right" timestamp="1599496940482">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="173" key="GridCell.Tab.2.right/0.0.1920.1040@0.0.1920.1040" timestamp="1599403659593" />
-    <state x="461" y="164" key="SettingsEditor" timestamp="1599310009942">
+    <state width="1877" height="192" key="GridCell.Tab.2.right/0.0.1920.1040@0.0.1920.1040" timestamp="1599496940482" />
+    <state x="461" y="164" key="SettingsEditor" timestamp="1599492478070">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="461" y="164" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1599310009942" />
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1599144228841">
+    <state x="461" y="164" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1599492478070" />
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1599404246209">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1599144228841" />
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1599404246209" />
     <state x="763" y="433" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1599144173104">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="763" y="433" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1040@0.0.1920.1040" timestamp="1599144173104" />
-    <state x="662" y="74" width="667" height="891" key="find.popup" timestamp="1599403675506">
+    <state x="662" y="74" width="696" height="891" key="find.popup" timestamp="1599497817353">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="662" y="74" width="667" height="891" key="find.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1599403675506" />
+    <state x="662" y="74" width="696" height="891" key="find.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1599497817353" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -282,6 +293,21 @@
           <url>file://$PROJECT_DIR$/runscore-admin/src/main/java/me/zohar/runscore/admin/storage/controller/StorageController.java</url>
           <line>50</line>
           <option name="timeStamp" value="23" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/runscore-mobile/src/main/java/me/zohar/runscore/gatheringcode/controller/GatheringCodeController.java</url>
+          <line>47</line>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/runscore-api/src/main/java/me/zohar/runscore/dictconfig/service/DictService.java</url>
+          <line>139</line>
+          <option name="timeStamp" value="38" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/runscore-api/src/main/java/me/zohar/runscore/merchant/service/MerchantOrderService.java</url>
+          <line>1106</line>
+          <option name="timeStamp" value="41" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -292,6 +318,7 @@
         <watch expression="param.getIp()" language="JAVA" />
         <watch expression="fileName" />
         <watch expression="param.getPayType()" language="JAVA" />
+        <watch expression="builder.and(predicates.toArray(new Predicate[predicates.size()]))" language="JAVA" />
       </configuration>
     </watches-manager>
   </component>

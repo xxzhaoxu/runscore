@@ -183,7 +183,6 @@ public class MerchantOrderService {
 		merchantOrderRepo.save(merchantOrder);
 		merchantOrderPayInfoRepo.save(payInfo);
 		receiveOrderSettlement(merchantOrder);
-
 		UserAccount userAccount = invalidOrder.getReceivedAccount();
 		Double cashDeposit = NumberUtil.round(userAccount.getCashDeposit() - merchantOrder.getGatheringAmount(), 4)
 				.doubleValue();
@@ -1105,8 +1104,7 @@ public class MerchantOrderService {
 				return predicates.size() > 0 ? builder.and(predicates.toArray(new Predicate[predicates.size()])) : null;
 			}
 		};
-		Page<MerchantOrder> result = merchantOrderRepo.findAll(spec,
-				PageRequest.of(param.getPageNum() - 1, param.getPageSize(), Sort.by(Sort.Order.desc("submitTime"))));
+		Page<MerchantOrder> result = merchantOrderRepo.findAll(spec, PageRequest.of(param.getPageNum() - 1, param.getPageSize(), Sort.by(Sort.Order.desc("submitTime"))));
 		PageResult<MerchantOrderVO> pageResult = new PageResult<>(MerchantOrderVO.convertFor(result.getContent()),
 				param.getPageNum(), param.getPageSize(), result.getTotalElements());
 		return pageResult;

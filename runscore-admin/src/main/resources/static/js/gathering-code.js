@@ -129,6 +129,8 @@ var gatheringCodeVM = new Vue({
 							return '手机号/姓名:' + row.mobile + '/' + row.realName;
 						} else if (row.gatheringChannelCode == 'alipayIdTransfer' || row.gatheringChannelCode == 'alipayIdXqd') {
 							return '<p>账号:' + row.account + '</p>' + '<p>支付宝id:' + row.alipayUserid + '</p>';
+						}else if (row.gatheringChannelCode == 'alipayhb'){
+							return '<p>群昵称:' + row.groupNickName + '</p>';
 						}
 					}
 				}, {

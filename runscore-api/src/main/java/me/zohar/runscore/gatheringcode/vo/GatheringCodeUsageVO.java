@@ -132,6 +132,8 @@ public class GatheringCodeUsageVO implements Serializable {
 
 	private Double todaySuccessRate;
 
+	private String groupNickName;
+
 	public static List<GatheringCodeUsageVO> convertFor(Collection<GatheringCodeUsage> gatheringCodeUsages) {
 		if (CollectionUtil.isEmpty(gatheringCodeUsages)) {
 			return new ArrayList<>();

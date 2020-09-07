@@ -21,7 +21,8 @@ var gatheringCodeVM = new Vue({
 			bankCard : '',
 			bankShortName : '',
 			googleVerCode : '',
-			payee : ''
+			payee : '',
+			groupNickName : ''
 		},
 		showEditGatheringCodeFlag : false,
 	},
@@ -192,7 +193,8 @@ var gatheringCodeVM = new Vue({
 				realName : '',
 				account : '',
 				googleVerCode : '',
-				payee : ''
+				payee : '',
+				groupNickName : ''
 			};
 			that.showEditGatheringCodePageInner();
 			that.initFileUploadWidget();
@@ -217,6 +219,7 @@ var gatheringCodeVM = new Vue({
 			var that = this;
 			var selectedGatheringChannel = that.selectedGatheringChannel;
 			var editGatheringCode = that.editGatheringCode;
+			console.log(editGatheringCode)
 			if (selectedGatheringChannel === null) {
 				layer.alert('请选择收款通道', {
 					title : '提示',
@@ -344,7 +347,7 @@ var gatheringCodeVM = new Vue({
 					}
 				}
 				that.addOrUpdateGatheringCodeInner();
-			} else if (selectedGatheringChannel.channelCode == 'wechat' || selectedGatheringChannel.channelCode == 'alipay' || selectedGatheringChannel.channelCode == 'ysf'|| selectedGatheringChannel.channelCode =='alipayhb') {
+			} else if (selectedGatheringChannel.channelCode == 'wechat' || selectedGatheringChannel.channelCode == 'alipay' || selectedGatheringChannel.channelCode == 'ysf') {
 				if (editGatheringCode.payee == null || editGatheringCode.payee == '') {
 					layer.alert('请选择收款人', {
 						title : '提示',
@@ -486,7 +489,7 @@ var gatheringCodeVM = new Vue({
 				}
 				editGatheringCode.alipayUserid = editGatheringCode.alipayUserid.replace(/\s+/g, '');
 				that.addOrUpdateGatheringCodeInner();
-			}else if (selectedGatheringChannel.channelCode == 'alipayhb1'){//支付宝红包
+			}else if (selectedGatheringChannel.channelCode == 'alipayhb'){//支付宝红包
 				if (editGatheringCode.payee == null || editGatheringCode.payee == '') {
 					layer.alert('请选择收款人', {
 						title : '提示',
@@ -495,7 +498,14 @@ var gatheringCodeVM = new Vue({
 					});
 					return;
 				}
-
+				if (editGatheringCode.groupNickName == null || editGatheringCode.groupNickName == ''){
+					layer.alert('请输入群昵称', {
+						title : '提示',
+						icon : 7,
+						time : 3000
+					});
+					return;
+				}
 				var filesCount = $('.gathering-code-pic').fileinput('getFilesCount');
 				if (filesCount == 0) {
 					layer.alert('请选择要上传的二维码', {
@@ -505,9 +515,7 @@ var gatheringCodeVM = new Vue({
 					});
 					return;
 				}
-				console.log("----------------------")
 				$('.gathering-code-pic').fileinput('upload');
-				// that.addOrUpdateGatheringCodeInner();
 			}
 		},
 

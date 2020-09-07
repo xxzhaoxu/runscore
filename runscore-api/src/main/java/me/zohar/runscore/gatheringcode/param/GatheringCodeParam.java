@@ -77,6 +77,8 @@ public class GatheringCodeParam {
 
 	private String googleVerCode;
 
+	private String groupNickName;
+
 	public GatheringCode convertToPo(String userAccountId) {
 		GatheringCode po = new GatheringCode();
 		BeanUtils.copyProperties(this, po);

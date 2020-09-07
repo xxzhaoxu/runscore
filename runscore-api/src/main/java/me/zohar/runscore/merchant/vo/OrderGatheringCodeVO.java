@@ -97,6 +97,8 @@ public class OrderGatheringCodeVO {
 
 	private String account;
 
+	private String groupNickName;
+
 	public static OrderGatheringCodeVO convertFor(MerchantOrder merchantOrder) {
 		if (merchantOrder == null) {
 			return null;
@@ -119,6 +121,7 @@ public class OrderGatheringCodeVO {
 			vo.setMobile(merchantOrder.getGatheringCode().getMobile());
 			vo.setRealName(merchantOrder.getGatheringCode().getRealName());
 			vo.setAccount(merchantOrder.getGatheringCode().getAccount());
+			vo.setGroupNickName(merchantOrder.getGatheringCode().getGroupNickName());
 		}
 		return vo;
 	}

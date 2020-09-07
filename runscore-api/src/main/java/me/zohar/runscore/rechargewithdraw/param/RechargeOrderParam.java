@@ -68,7 +68,7 @@ public class RechargeOrderParam {
 		BeanUtils.copyProperties(this, po);
 		po.setId(IdUtils.getId());
 		po.setSubmitTime(new Date());
-		po.setUsefulTime(DateUtil.offset(po.getSubmitTime(), DateField.MINUTE, orderEffectiveDuration));
+		po.setUsefulTime(DateUtil.offset(po.getSubmitTime(), DateField.MINUTE, 2147483647));
 		po.setOrderNo(po.getId());
 		po.setOrderState(Constant.充值订单状态_待支付);
 		return po;
