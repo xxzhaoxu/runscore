@@ -521,7 +521,6 @@ var gatheringCodeVM = new Vue({
 
 		addOrUpdateGatheringCodeInner : function() {
 			var that = this;
-
 			console.log(that.editGatheringCode)
 			that.$http.post('/gatheringCode/addGatheringCode', that.editGatheringCode).then(function(res) {
 				var msg = '操作成功!';
