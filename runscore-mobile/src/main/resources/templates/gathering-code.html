@@ -59,7 +59,7 @@
 			</ul>
 			<div class="form-details" v-for="gatheringCode in gatheringCodes">
 				<div class="form-details-body">
-					<div class="form-details-item form-details-item-sm" v-if="gatheringCode.gatheringChannelCode == 'wechat' || gatheringCode.gatheringChannelCode == 'alipay' || gatheringCode.gatheringChannelCode == 'ysf'">
+					<div class="form-details-item form-details-item-sm" v-if="gatheringCode.gatheringChannelCode == 'wechat' || gatheringCode.gatheringChannelCode == 'alipay' || gatheringCode.gatheringChannelCode == 'ysf' || gatheringCode.gatheringChannelCode=='alipayhb'">
 						<label>收款人:</label> <span class="form-details-item-highlight">{{gatheringCode.payee}}</span>
 					</div>
 					<div class="form-details-item form-details-item-sm" v-if="gatheringCode.gatheringChannelCode == 'alipayIdTransfer' || gatheringCode.gatheringChannelCode == 'alipayTransfer'  || gatheringCode.gatheringChannelCode == 'wechatMobile' || selectedGatheringChannel.channelCode == 'alipayIdXqd'">
